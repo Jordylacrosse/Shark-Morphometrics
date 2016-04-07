@@ -423,9 +423,6 @@ jaw_type <-as.factor(upper[ ,4])
 
 matshark <- as.matrix(coords)
 
-matshark_upper <- as.matrix(upper_coord)
-matshark_lower <- as.matrix(lower_coord)
-
 
 #overall lda
 
@@ -435,6 +432,9 @@ plot(shark_lda, col = 'blue')
 #this does a pretty nice job of separating species out from one another
 #But we can't tell what is the upper and lower jaw. Continue to do an 
 #lda that distinguishes the upper and lower jaws from one another. 
+#this is the opposite result of the pca; it does a better job at 
+#distinguishing between species but not jaw type.
+
 ```
 
 #analyze the lda with the upper and lower jaws separated
@@ -442,19 +442,13 @@ plot(shark_lda, col = 'blue')
 
 ```{r}
 
-
 upper_coord<- upper[, 6:33]
 lower_coord <- lower[, 6:33]
 
-jaw_type <-as.factor(upper[ ,4])
-
-
-matshark <- as.matrix(coords)
 matshark_upper <- as.matrix(upper_coord)
 matshark_lower <- as.matrix(lower_coord)
 
  
-
 #Upper
 
 upper_lda <- lda(matshark_upper, as.factor(upper[ ,2]))
@@ -463,6 +457,8 @@ plot(lda(matshark_upper, as.factor(upper[ ,2])))
 #Here are the upper jaws, and the discriminant function is able to cluster #species
 #distinct from one another from the upper jaw teeth. Upper jaw teeth shape #are a clasifier
 #for identification to species
+#we can see that the lda detected collinear variables, which is probably why it 
+#couldn't distinguish between jaws and species. 
 
 
 #Lower
@@ -475,7 +471,6 @@ plot(lda(matshark_lower, as.factor(lower[ ,2])))
 #due to the fact they exhibit similar shape. So lower jaw teeth are not as #good
 #for identifying down to the species level based on tooth shape because #they
 #share more overlap. 
-
 
 
 ```
@@ -528,7 +523,7 @@ dist(predict(shark_lda, meangroup)$x)
 #Clustering our Data Set; Cluster Analysis
 
 This emphasizes both differences and similarities among individual clusters
-by clustering these entities based on inter-entity resemblance.
+by clustering these entities based on inter-entity resemblance. 
 
 #find optimal number of clusters for dataset
 
@@ -549,32 +544,17 @@ SSratio <- numeric(10)
 plot(1:10, SSratio, xlab="number of clusters", ylab="% of explained variance")
 points(1:10, c(0, SSratio[2:10]), pch=3)
 
-
+#we can see here that the amount of clusters that will explain the most 
+#amount of variance is about 6 (where it reaches the threshhold.)
 ```
 
 #apply cluster function to dataset
 
 will emphasize both differences and similarities among the samples by clustering
-entities based on inter-group resemblance. 
+entities based on inter-group resemblance. Plot 6 clusters into the function.
 
 ```{r}
-
-totv <- sum(diag(var(p[, 1:28])))*387
-SSratio <- numeric(10)
- for (i in 2:10)
- {mod <- kmeans(p[, 1:28],i)
-   SSratio[i]<-(totv-sum(mod$withinss))/totv}
-   
-#Plot using k means method to estimate ideal number of clusters
-
-plot(1:10, SSratio, xlab="number of clusters", ylab="% of explained variance")
-points(1:10, c(0, SSratio[2:10]), pch=3)
-
-#This is showing that the optimal amount of clusters in the data set to explain the most
-#variance is ~6. (which makes sense because we have upper and lower jaws for 3 different
-#species. a priori notion that there may be 6 clusters)
-
-
+library(cluster)
 library("clusterGeneration", lib.loc="~/R/win-library/3.1")
 pam(p[,1:28], 6)$clustering
 
@@ -625,7 +605,6 @@ are associated with shape change shown by a large standard deviation.
 ##Extract Tooth Position 5 for the Upper Jaw for 3 species
 
 ```{r}
-
 
 upper<-sharkdat[sharkdat$jaw.type=="U",]
 fifth <- upper[upper$tooth.position=="5",]
@@ -754,7 +733,4 @@ apply(cbind(adist,bdist,fdist),1,sd)
 #the most change in shape with regards to species in the upper jaw.
 #we can see a considerable amount of variation due to landmark 3, 10, and 13 as well. 
 
-
-
 ```
-
