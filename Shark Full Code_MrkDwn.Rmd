@@ -15,8 +15,6 @@ View(sharkdat)
 ```
 
 #Subset species
-Subset Jaw
-Subset jaw for each species
 
 ```{r} 
 
@@ -36,31 +34,10 @@ lower<-sharkdat[sharkdat$jaw.type=="L",]
 upper_coord<- upper[, 6:33]
 lower_coord <- lower[, 6:33]
 
-#coordinates of just altimus sp. 
+#as.factor jaw and tooth from the entire dataset
 
-altimus_coords <- altimus[ ,6:33]
-upper_alt_coord <- upper_alt[ ,6:33 ]
-lower_alt_coord <- lower_alt[ ,6:33 ]
-
-#subset jaw and tooth from the entire dataset
-
-jaw <- as.factor(sharkdat$jaw.type)
-tooth <- as.factor(sharkdat$tooth.position)
-
-#subset jaws: upper and lower for altimus
-
-upper_alt <- altimus[altimus$jaw.type=="U",]
-lower_alt <-  altimus[altimus$jaw.type=="L",]
-
-#subset upper and lower jaws for brevipinna
-
-upper_brevi <- brevipinna[brevipinna$jaw.type=="U",]
-lower_brevi <-  brevipinna[brevipinna$jaw.type=="L",]
-
-#subset upper and lower jaws for falciformis
-
-upper_falci <- falciformis[falciformis$jaw.type=="U",]
-lower_falci <- falciformis[falciformis$jaw.type=="L",]
+jaw <- as.factor(sharkdat$jaw.type) #2 levels, upper and lower
+tooth <- as.factor(sharkdat$tooth.position) #15 levels, tooth position
 
 
 ```
@@ -91,7 +68,6 @@ get_xydat = function(ct_mat) {
     return(xy_mat)
 }
 
-
 ```
 
 #All Species Coordinate Data
@@ -102,15 +78,8 @@ get_xydat = function(ct_mat) {
 
 coords = sharkdat[ , 6:33]
 all_shark_coords <- get_xydat(coords)
-all_shark_coords
 
 head(all_shark_coords) 
-
-tail(all_shark_coords)
-
-all_x <- all_shark_coords$x
-all_y <- all_shark_coords$y
-
 
 #this has put all teeth as it's own individual. We have 5 animals consisting of 3 species, and each animal has 30 teeth (15 upper and 15 lower). Each tooth has 14 landmarks found on it, represented by coordinates x and y. 
 
@@ -124,8 +93,16 @@ for each species.)
 
 ```{r}
 
-
 #ALTIMUS
+
+#subset jaws: upper and lower for altimus
+
+upper_alt <- altimus[altimus$jaw.type=="U",]
+lower_alt <-  altimus[altimus$jaw.type=="L",]
+
+upper_alt_coord <- upper_alt[ ,6:33 ]
+lower_alt_coord <- lower_alt[ ,6:33 ]
+
 
 altimus_coords <- altimus[ ,6:33]
 xydat_alti_all <- get_xydat(altimus_coords) #xy data for all altimus teeth
@@ -139,6 +116,11 @@ xydat_alti_lower <- get_xydat(lower_alt_coord)
 
 #BREVIPINNA
 
+#subset upper and lower jaws for brevipinna
+
+upper_brevi <- brevipinna[brevipinna$jaw.type=="U",]
+lower_brevi <-  brevipinna[brevipinna$jaw.type=="L",]
+
 brevipinna_coords <- brevipinna[ , 6:33]
 xydat_brevi_all <-  get_xydat(brevipinna_coords) #xy data for all brevi teeth
 
@@ -150,6 +132,11 @@ xydat_brevi_lower <- get_xydat(lower_brevi_coord) #xy data lower brevi teeth
 
 
 #FALCIFORMIS
+
+#subset upper and lower jaws for falciformis
+
+upper_falci <- falciformis[falciformis$jaw.type=="U",]
+lower_falci <- falciformis[falciformis$jaw.type=="L",]
 
 falciformis_coords <- falciformis[ ,6:33]
 xydat_falci_all = get_xydat(falciformis_coords) #xy data for all falci
@@ -165,25 +152,15 @@ xydat_falci_lower <- get_xydat(lower_falci_coord) #xy data for lower jaw of falc
 
 
 
-
-
 #Mean Upper and Lower Jaw Coordinates for Altimus. 
 
 ```{r}
-
-
-xydat_alti_upper
-head(xydat_alti_upper)
-class(xydat_alti_upper)
-tapply(xydat_alti_upper$x, xydat_alti_upper$landmark, mean)
-
-
+#find the mean of x and y for each landmark position
 #mean coordinates for altimus upper jaw
 
 x_avg_alt_upper = tapply(xydat_alti_upper$x, xydat_alti_upper$landmark, mean)
 y_avg_alt_upper = tapply(xydat_alti_upper$y, xydat_alti_upper$landmark, mean)
 
-tapply(xydat_alti_upper$x, xydat_alti_upper$landmark, sd)
 
 #mean coordinates for lower jaw of altimus
 
@@ -216,7 +193,7 @@ points(x_avg_alt_upper, y_avg_alt_upper, pch=19, col='red') #mean plotted in red
 #indicated in data set by tooth.position in sharkdat)
 
 
-#Lower Jaw
+#do the same for the Lower Jaw
 
 plot(x_avg_alt_lower, y_avg_alt_lower)
 plot(x_avg_alt_lower, y_avg_alt_lower, pch=19, col='red')
@@ -232,6 +209,10 @@ points(x_avg_alt_lower, y_avg_alt_lower, pch=19, col='red')
 #when we do the same thing for the lower jaw of altimus, we can see that
 #(visually) that the mean shape changes due to the jaw type *lower* and 
 #the distribution of coordinates around each landmark changes. 
+
+#we could do this same visual technique to analyze shape change for each species,
+#but the focus is to look at shape change between the species. Not positional 
+#change.
 
 ```
 
@@ -256,6 +237,8 @@ anova(all_rda, by="margin")
 
 
 RsquareAdj(all_rda)
+
+#variance explained by the RDA is about 58%. This is fairly good. 
 
 plot(all_rda, type='n', scaling=1)
 orditorp(all_rda, display='sp', cex=0.5, scaling=1, col='blue')
@@ -286,28 +269,22 @@ but for a visual, let's analyze the distribution of raw data in a PCA; see if th
 ##PCA
 
 
-
-
 ```{r}
-
-
-upper<-sharkdat[sharkdat$jaw.type=="U",]
-lower<-sharkdat[sharkdat$jaw.type=="L",]
-
-upper_coord<- upper[, 6:33]
-lower_coord <- lower[, 6:33]
-
 
 #Run PCA on all of the shark data; 3 species
 
-coords = sharkdat[ , 6:33]
-row.names(coords) = sharkdat$Id
-pca = princomp(coords)  #pca of all coordainates
-biplot(pca, cex=.5)
-pca$loadings
-summary(pca)
+coords <- sharkdat[ , 6:33]
+row.names(coords) <- sharkdat$Id
+pca_shark = princomp(coords)  #pca of all coordainates
+biplot(pca_shark, cex=.5)
+pca_shark$loadings
+summary(pca_shark)
+#PCA 1 and 2 explain about 67% of the overall variance which also does a very
+#good job. however, PCA does not base this off of a priori groups. 
 
-plot(pca)
+
+
+plot(pca_shark)
 
 #Here we can see a significant amount of structure occuring in our raw #data. We can see that there are 2 obvious clusters within the overall
 #raw data, the upper jaw teeth of all species cluster separately from 
@@ -338,6 +315,9 @@ biplot(pca_lower, cex= .5)
 #species separation/overlap for the upper and lower jaws. 
 
 ```
+
+Here we can see the PCA has a clear distinction between the upper and lower jaws
+, I want to try and see if a CVA will be able to distinguish between species too. 
 
 
 ##CVA; canonical variate analysis
@@ -382,6 +362,10 @@ ylab=paste("2nd canonical axis", paste(round(cva_1$Var[2,1],1),"%")))
 
 text(cva_1$CVscores, as.character(factor), col=as.numeric(factor), cex=.7)
 
+#This does a much better job than the PC in distinguishing groups of species
+#for the upper and lower jaws. It also explains 20% more variance than the first
+#two pC's do. 
+
 
 library(lattice)
 
@@ -399,7 +383,7 @@ histogram(~cva_1$CVscores[,2]|factor,
       xlab=paste("2nd canonical axis", paste(round(cva_1$Var[2,2],1),"%")))
 
 
-#plot Mahalahobis
+#plot Mahalahobis; this will show the relationships between my groups
 
 dendroS=hclust(cva_1$Dist$GroupdistMaha)
 dendroS$labels=levels(factor)
@@ -416,6 +400,7 @@ cva_1$Var
 barplot(cva_1$Var[,2])
 
 #CV's do a very good job of explaining overall variation in the dataset.
+#much better than the PCA. 
 
 ```
 
