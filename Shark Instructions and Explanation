@@ -22,3 +22,15 @@ To analyze a visual of overall shape, the upper and lower jaw for each species h
 
 
 The code aims to answer 4 main points: : (1) if teeth could be quantitatively distinguished from one another on the species level, (2) the effect of species, jaw type, individual, and tooth position on shape, (3) are some teeth better than others for distinguishing among species, and (4) what landmarks attribute to the most variation in shape among species.
+
+The Scripts (found in scripts folder) should be Run as Follows: 
+
+1)Subsetting Shark Data 
+2)Shark_Ordination
+3) Shark_RDA
+4) Shark_LDA
+5) Shark_Euclidean
+6) To go through the entire project flow in one mark down,use Shark Full 
+Code_MrkDwn
+
+The figures have been isolated in a separate folder named "Figures"
