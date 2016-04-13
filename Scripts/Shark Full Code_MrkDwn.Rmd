@@ -533,7 +533,9 @@ dist(predict(shark_lda, meangroup)$x)
 #overlap occuring between Cf and Cb, and we can still see the clustering of Ca #separate from the other 2 species. The differences are skewed in here because
 #this is combining both the shape data for the upper and lower jaws. The previous
 #calculation (distance) separting out the jaw type is a better depiction 
-#of analyzing the shape data. 
+#of analyzing the shape data. And here we can see that the upper jaw teeth
+#are a better indication of identifying species than the lower jaw teeth,
+#since there is significant overlap with the lower jaw teeth .
 
 ```
 
