@@ -621,6 +621,7 @@ are associated with shape change shown by a large standard deviation.
 ----------------------------------------------------------------------------
 ##Extract Tooth Position 5 for the Upper Jaw for 3 species
 #what landmarks attribute to the most variation in shape among species (euclidean distance)
+
 ```{r}
 
 upper<-sharkdat[sharkdat$jaw.type=="U",]
