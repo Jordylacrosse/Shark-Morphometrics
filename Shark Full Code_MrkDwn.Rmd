@@ -221,6 +221,8 @@ points(x_avg_alt_lower, y_avg_alt_lower, pch=19, col='red')
 since I am working with multivariate data (14 response landmarks each with their own x/y coordinates), would like to extract those gradients of variation in tooth shape (landmarks) expalinable by the independent variables (tooth position, individual, species, and jaw type)
 The RDA serves the purpose of a MANOVA for my dataset .
 
+#What is the effect of species, jaw type, and tooth position on overall variation?
+
 ```{r}
 
 #run an RDA to look at variance partitioning
@@ -230,10 +232,11 @@ all_rda <- rda(coords ~ sharkdat$species + as.factor(sharkdat$jaw.type) +
 
 #after looking at several RDA's (looking at interactions and inclusion of #individuals) , this RDA outputs the most variance explained by the #independent variables. 
 
+anova(all_rda, permutations = 1000)
 anova(all_rda, by="margin")
 
-#output shows that jaw type accounts for a significant amount of variation 
-#more than species. 
+#output shows that jaw type accounts for a significant amount of variation, followed 
+#by species and then tooth position. 
 
 
 RsquareAdj(all_rda)
@@ -266,8 +269,11 @@ showvarparts(3)
 The RDA allows us to see what predictor variables account for variation
 but for a visual, let's analyze the distribution of raw data in a PCA; see if there is an emphasis in variation among the individual samples by gradients of the total sample variance. Visually Analyze structure of distribution of sample variance 
 
+------------------------------------------------------------------------
+#Ordination Methods
 ##PCA
 
+#can teeth be quantitatively distinguished from one another?
 
 ```{r}
 
@@ -299,12 +305,12 @@ plot(pca_shark)
 #look at pca of upper and lower jaw separate to see if species separate
 
 upper_coord
-row.names(upper_coord) <- upper$species
+row.names(upper_coord) <- upper$Id
 pca_upper <- princomp(upper_coord)
 biplot(pca_upper, cex = .5)
 
 lower_coord
-row.names(lower_coord) <- lower$species
+row.names(lower_coord) <- lower$Id
 pca_lower <- princomp(lower_coord)
 biplot(pca_lower, cex= .5)
 
@@ -341,6 +347,9 @@ factor <- as.factor(paste(sharkdat$species, sharkdat$jaw.type, sep="_"))
 cva_1 <- CVA(coords, groups=factor, weighting = TRUE, plot = TRUE,
              rounds = 0, cv = FALSE, p.adjust.method = "none")
 
+cva_1$Var
+cva_2$Dist
+
 # get the typicality probabiliites and classifications - tagging specimens with a low probability < 0.01
 #as an outlie (unassigned) 
 
@@ -361,6 +370,13 @@ xlab=paste("1st canonical axis", paste(round(cva_1$Var[1,1],1),"%")),
 ylab=paste("2nd canonical axis", paste(round(cva_1$Var[2,1],1),"%")))
 
 text(cva_1$CVscores, as.character(factor), col=as.numeric(factor), cex=.7)
+
+#add elipses
+     for(ii in 1:length(levels(factor))){
+        dataEllipse(cva_1$CVscores[factor==levels(factor)[ii],1],
+          cva_1$CVscores[factor==levels(factor)[ii],2], 
+          add=TRUE,levels=.80, col=c(1:7)[ii])
+  }
 
 #This does a much better job than the PC in distinguishing groups of species
 #for the upper and lower jaws. It also explains 20% more variance than the first
@@ -404,9 +420,10 @@ barplot(cva_1$Var[,2])
 
 ```
 
-
+-------------------------------------------------------------------------------
 
 ##LDA of entire (all) matrix by species
+#are some teeth better than others than distinguishing among species
 
 ```{r}
 
@@ -601,9 +618,9 @@ upper jaw
 if there is visual shape change across these 3 species, and what landmarks
 are associated with shape change shown by a large standard deviation. 
 
-
+----------------------------------------------------------------------------
 ##Extract Tooth Position 5 for the Upper Jaw for 3 species
-
+#what landmarks attribute to the most variation in shape among species (euclidean distance)
 ```{r}
 
 upper<-sharkdat[sharkdat$jaw.type=="U",]
