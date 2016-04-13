@@ -348,7 +348,7 @@ cva_1 <- CVA(coords, groups=factor, weighting = TRUE, plot = TRUE,
              rounds = 0, cv = FALSE, p.adjust.method = "none")
 
 cva_1$Var
-cva_2$Dist
+cva_1$Dist
 
 # get the typicality probabiliites and classifications - tagging specimens with a low probability < 0.01
 #as an outlie (unassigned) 
@@ -361,7 +361,8 @@ print(typprobs)
 #Plotting the CV
 
 ```{r}
-
+install.packages("car")
+require(car)
 
 #visualize CV scores by their groups 
 
