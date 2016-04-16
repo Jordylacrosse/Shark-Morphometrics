@@ -195,10 +195,6 @@ points(x_avg_alt_upper, y_avg_alt_upper, pch=19, col='red') #mean plotted in red
 
 #do the same for the Lower Jaw
 
-plot(x_avg_alt_lower, y_avg_alt_lower)
-plot(x_avg_alt_lower, y_avg_alt_lower, pch=19, col='red')
-
-points(xydat_alti_lower$x, xydat_alti_lower$y)
 plot(x_avg_alt_lower, y_avg_alt_lower, pch=19, col='red', xlim=range(xydat_alti_lower$x), ylim=range(xydat_alti_lower$y))
 range(xydat_alti_lower$x)
 
@@ -409,6 +405,7 @@ dendroS=as.dendrogram(dendroS)
 plot(dendroS, main='',sub='', xlab="Shark Species and Jaw",
      ylab='Mahalahobis distance')
 
+cva_1$Dist
 
 # Variance explained by the canonical roots:
 
