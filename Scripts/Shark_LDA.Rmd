@@ -4,7 +4,7 @@ output: pdf_document
 ---
 
 ##LDA of entire (all) matrix by species
-#are some teeth better than others than distinguishing among species
+#are some teeth better than others than distinguishing among species?
 
 ```{r}
 
@@ -27,15 +27,15 @@ matshark <- as.matrix(coords)
 shark_lda <- lda(matshark, as.factor(sharkdat[ ,2]))
 plot(shark_lda, col = 'blue')
 
-#this does a pretty nice job of separating species out from one another
-#But we can't tell what is the upper and lower jaw. Continue to do an 
+#this doesn't do a good job of separating species out from one another
+#We can't tell what is the upper and lower jaw and where species are
+#distinct from one another. Continue to do an 
 #lda that distinguishes the upper and lower jaws from one another. 
-#this is the opposite result of the pca; it does a better job at 
-#distinguishing between species but not jaw type.
+
 
 ```
 
-#analyze the lda with the upper and lower jaws separated
+
 #LDA of Species, Upper and Lower Jaws Separated. 
 
 ```{r}
@@ -56,7 +56,7 @@ plot(lda(matshark_upper, as.factor(upper[ ,2])))
 #distinct from one another from the upper jaw teeth. Upper jaw teeth shape #are a clasifier
 #for identification to species
 #we can see that the lda detected collinear variables, which is probably why it 
-#couldn't distinguish between jaws and species. 
+#couldn't distinguish between jaws and species earlier. 
 
 
 #Lower
@@ -64,12 +64,11 @@ plot(lda(matshark_upper, as.factor(upper[ ,2])))
 lower_lda <- lda(matshark_lower, as.factor(lower[ ,2]))
 plot(lda(matshark_lower, as.factor(lower[ ,2])))
 
-#Here we can see that the altimus species have completely different lower #teeth
-#but the lower teeth of falciformis and brevipinna have lots of overlap, 
+#Here we can see that the altimus species have  different lower #teeth from B and F. 
+#but the lower teeth of falciformis and brevipinna have significant overlap, 
 #due to the fact they exhibit similar shape. So lower jaw teeth are not as #good
 #for identifying down to the species level based on tooth shape because #they
-#share more overlap. 
-
+#have more similar shape. less variation of lower jaw teeth between species 
 
 ```
 
@@ -121,7 +120,8 @@ dist(predict(shark_lda, meangroup)$x)
 #Clustering our Data Set; Cluster Analysis
 
 This emphasizes both differences and similarities among individual clusters
-by clustering these entities based on inter-entity resemblance. 
+by clustering these entities based on inter-entity resemblance. This 
+is another technique reinforcing what was previoulsy found by the CVA. 
 
 #find optimal number of clusters for dataset
 
@@ -143,7 +143,9 @@ plot(1:10, SSratio, xlab="number of clusters", ylab="% of explained variance")
 points(1:10, c(0, SSratio[2:10]), pch=3)
 
 #we can see here that the amount of clusters that will explain the most 
-#amount of variance is about 6 (where it reaches the threshhold.)
+#amount of variance is about 6 (where it reaches the threshhold.). This 
+#is consistent with the CVA which also found 6 clusters that explained 85% of the
+#variation in the dataset. 
 ```
 
 #apply cluster function to dataset
@@ -163,29 +165,7 @@ plot(pam(x=p[,1:28], k=6), main= "", col.p="black")
 #those formed from the upper and lower jaws of each species. (3 species)
 #Notice significant overlap which is most likely due to species similarity,
 #but we can see some good separation most likely due to jaw type (which 
-#does explain the most variation as seen in our RDA). So let's evaluate clustering
-#due to just 2 clusters, upper and lower jaw type. So this analysis confirms
-#our previous findings in the LDA analysis. Let's see if it does a better
-#job when we separate just to 2 clusters, which we saw in the PCA. 
-
-
-#Examine the same plot but examine Upper vs. Lower Teeth overlap
-#Upper teeth are indicated with a number 2, lower teeth with a number 1. 
-#Lower teeth in the first position are categorized in the upper jaw group
-#because they have a indentical shape form to those in the upper jaw.
-#clear separation is seen, overlap is due to similar teeth shapes of the first position teeth
-#of lower jaw with upper. 
-
-pam(x=p[,1:28], 2)$clustering
-plot(pam(x=p[,1:28], k=2), main= "", col.p="black")
-
-
-#confirms our previous findings that the jaws are the better descriptor 
-#of variation than are species. 
-#from here, using the upper jaws (since it is better to detect differences between species, let's analyze to see which landmark contributes to the most change
-#between the species, so which might be the cause of shape change between these 3 #spcies. )
-
-
+#does explain the most variation as seen in our RDA). 
 ```
 
 

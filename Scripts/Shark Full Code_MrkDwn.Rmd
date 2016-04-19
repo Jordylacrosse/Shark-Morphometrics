@@ -352,6 +352,14 @@ cva_1$Dist
 typprobs <- typprobClass(cva_1$CVscores,groups=factor)
 print(typprobs)
 
+#the classification accurracy of the CV is about 86%. This is extremely high
+#and shows that the separation among the teeth for each species is correct 
+#86% of the time. 
+
+#can see the model has a difficult time distinguishing between the falciformis
+#and brevipinna teeth from the lower jaw. These are 2 groups have a 
+#high probability of misclassifying the teeth
+
 ```
 
 #Plotting the CV
@@ -582,28 +590,7 @@ plot(pam(x=p[,1:28], k=6), main= "", col.p="black")
 #those formed from the upper and lower jaws of each species. (3 species)
 #Notice significant overlap which is most likely due to species similarity,
 #but we can see some good separation most likely due to jaw type (which 
-#does explain the most variation as seen in our RDA). So let's evaluate clustering
-#due to just 2 clusters, upper and lower jaw type. So this analysis confirms
-#our previous findings in the LDA analysis. Let's see if it does a better
-#job when we separate just to 2 clusters, which we saw in the PCA. 
-
-
-#Examine the same plot but examine Upper vs. Lower Teeth overlap
-#Upper teeth are indicated with a number 2, lower teeth with a number 1. 
-#Lower teeth in the first position are categorized in the upper jaw group
-#because they have a indentical shape form to those in the upper jaw.
-#clear separation is seen, overlap is due to similar teeth shapes of the first position teeth
-#of lower jaw with upper. 
-
-pam(x=p[,1:28], 2)$clustering
-plot(pam(x=p[,1:28], k=2), main= "", col.p="black")
-
-
-#confirms our previous findings that the jaws are the better descriptor 
-#of variation than are species. 
-#from here, using the upper jaws (since it is better to detect differences between species, let's analyze to see which landmark contributes to the most change
-#between the species, so which might be the cause of shape change between these 3 #spcies. )
-
+#does explain the most variation as seen in our RDA). 
 
 ```
 
@@ -611,7 +598,7 @@ plot(pam(x=p[,1:28], k=2), main= "", col.p="black")
 Since the upper jaw teeth are the most identifiable to species (more variable),
 let's 
 analyze where shape change is occuring in a single tooth relative to species.
-In a previous  study, Naylor noted that the 5th position tooth in the upper 
+In  previous  studies, Garrick and Naylor noted that the 5th position tooth in the upper 
 jaw is better to distinguish among species. By looking at just one tooth in the 
 upper jaw
 , we are now limiting shape change now to due to species. I want to see if 
@@ -749,6 +736,10 @@ apply(cbind(adist,bdist,fdist),1,sd)
 
 #so we can see that the 4th landmark (the tip of the blade) contributes to
 #the most change in shape with regards to species in the upper jaw.
-#we can see a considerable amount of variation due to landmark 3, 10, and 13 as well. 
+#we can see a considerable amount of variation due to landmark 3, 10, and 13 as well.
+
+#this could also be done for the same position in the lower jaw, however, the LDA 
+#expressed significant overlap. Therefore, I am leaving this analysis to only 
+#the upper jaw since these are the best descriptors of species. 
 
 ```
