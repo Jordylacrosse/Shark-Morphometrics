@@ -226,7 +226,7 @@ The RDA serves the purpose of a MANOVA for my dataset .
 all_rda <- rda(coords ~ sharkdat$species + as.factor(sharkdat$jaw.type) +
                  as.factor(sharkdat$tooth.position))
 
-#after looking at several RDA's (looking at interactions and inclusion of #individuals) , this RDA outputs the most variance explained by the #independent variables. 
+#after looking at several RDA's (looking at interactions and inclusion of #individuals) , this RDA outputs the most variance explained by the #independent variables. #the inclusion of individual was shown to have no effect.
 
 anova(all_rda, permutations = 1000)
 anova(all_rda, by="margin")
@@ -250,6 +250,7 @@ jaw_dum = dummy(sharkdat$jaw.type)
 pos_dum = dummy(sharkdat$tooth.position)
 
 varpart(coords, sp_dum, jaw_dum, pos_dum)
+#this shows that tooth position explains more variation than species
 showvarparts(3)
 
 
@@ -282,7 +283,8 @@ biplot(pca_shark, cex=.5)
 pca_shark$loadings
 summary(pca_shark)
 #PCA 1 and 2 explain about 67% of the overall variance which also does a very
-#good job. however, PCA does not base this off of a priori groups. 
+#good job. however, PCA does not base this off of a priori groups. I wanted
+#to be able to see if species could be differentiated from one another. 
 
 
 
@@ -365,6 +367,7 @@ print(typprobs)
 #Plotting the CV
 
 ```{r}
+
 install.packages("car")
 require(car)
 
@@ -548,7 +551,10 @@ dist(predict(shark_lda, meangroup)$x)
 #Clustering our Data Set; Cluster Analysis
 
 This emphasizes both differences and similarities among individual clusters
-by clustering these entities based on inter-entity resemblance. 
+by clustering these entities based on inter-entity resemblance. This technique
+is supporting what was previously found in the CVA. It notes that the optimal
+amount of clusters found is 6, which explain the most variation in the dataset,
+which is what the CVA was able to conclude. 
 
 #find optimal number of clusters for dataset
 
