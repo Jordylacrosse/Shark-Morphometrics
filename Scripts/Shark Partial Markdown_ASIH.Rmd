@@ -1,0 +1,386 @@
+---
+title: "Shark Partial_9 species"
+output: pdf_document
+---
+
+
+```{r}
+
+#Read in the Shark data;  separating out the 3 species and jaw type for each sp.
+
+
+library(vegan)
+library(dummies)
+
+#import data set (top tab in tools) data is in GIT scripts, SharkPartialData.txt
+
+SharkPartialData <- read.delim("~/Shark-Morphometrics/Scripts/SharkPartialData.txt")
+View(SharkPartialData)
+
+```
+
+#Subset species
+
+```{r} 
+
+#Subset species and jaw type.
+#The 9 species below are in the genus
+#Carcharhinus (requiem sharks), Rhizoprionodon, Sphyrna, and Prionance glauca.
+
+acronotus<- SharkPartialData[SharkPartialData$species=="Ca",]
+altimus<- SharkPartialData[SharkPartialData$species=="ca",]
+brevipinna<- SharkPartialData[SharkPartialData$species=="Cb",]
+falciformis<- SharkPartialData[SharkPartialData$species=="Cf",]
+longimanus<- SharkPartialData[SharkPartialData$species=="Cg",]
+leucas<- SharkPartialData[SharkPartialData$species=="Cu",]
+prionace<- SharkPartialData[SharkPartialData$species=="Pg",]
+lewini<- SharkPartialData[SharkPartialData$species=="Sl",]
+terra<- SharkPartialData[SharkPartialData$species=="Rt",]
+
+#subset of upper and lower jaws (includes all species)
+
+upperjaw<-SharkPartialData[SharkPartialData$jaw.type=="U",]
+lowerjaw<-SharkPartialData[SharkPartialData$jaw.type=="L",]
+
+upper_coords <- upperjaw[, 7:34]
+lower_coords <- lowerjaw[, 7:34]
+
+#as.factor jaw and tooth from the entire dataset
+
+jaw <- as.factor(SharkPartialData$jaw.type) #2 levels, upper and lower
+tooth <- as.factor(SharkPartialData$tooth.position) #15 levels, tooth position
+
+```
+
+
+#Loop to edit data frame into matrix
+
+```{r}
+
+#fucntion for transforming data frame into a matrix
+
+get_xydat = function(ct_mat) {
+    if (class(ct_mat) != 'matrix') {
+        ct_mat = as.matrix(ct_mat)
+        print('Converting input to a matrix')
+    }
+    nmarkers =  ncol(ct_mat) /2 
+    xy_mat = matrix(NA, nrow= nrow(ct_mat) * nmarkers, ncol=4)
+    colnames(xy_mat) = c('indiv', 'landmark', 'x','y')
+    startrow = 1
+    for(i in 1:nrow(ct_mat)) { 
+        x = ct_mat[i, seq(1, ncol(ct_mat) - 1, 2)]
+        y = ct_mat[i, seq(2, ncol(ct_mat), 2)]
+        endrow = i * nmarkers
+        xy_mat[startrow:endrow , ] = cbind(rep(i, nmarkers), 1:nmarkers, x,y)
+        startrow = endrow + 1
+    }
+    xy_mat = as.data.frame(xy_mat)
+    return(xy_mat)
+}
+
+```
+
+#All Species Coordinate Data
+
+```{r}
+
+#all coordinates for entire shark data set
+
+allcoords = SharkPartialData[ , 7:34]
+all_coords <- get_xydat(allcoords)
+
+head(all_coords) 
+
+```
+
+#What is the effect of species, jaw type, and tooth position on overall variation?
+
+```{r}
+
+#run an RDA to look at variance partitioning
+
+partial_rda <- rda(allcoords ~ SharkPartialData$species + as.factor(SharkPartialData$jaw.type) +
+                 as.factor(SharkPartialData$tooth.position) + as.factor(SharkPartialData$replicate))
+
+
+anova(partial_rda, permutations = 1000)
+anova(partial_rda, by="margin")
+
+#output shows that jaw type accounts for a significant amount of variation, followed 
+#by species and then tooth position. The effect of replicate is so sublte compared to the biological
+#variation being tested, that digitizing error is not considered to have any effect on tooth shape analysis.
+
+#Further tests will only look at species, jaw type and tooth position for having any effect on tooth shape. 
+
+RsquareAdj(partial_rda)
+
+#variance explained by the RDA is about 65%. This is really good. 
+
+plot(partial_rda, type='n', scaling=1)
+orditorp(partial_rda, display='sp', cex=0.5, scaling=1, col='blue')
+text(partial_rda, display='bp', col='red')
+
+#VarPart for Variance Partitioning
+
+spec_dum = dummy(SharkPartialData$species)
+jawty_dum = dummy(SharkPartialData$jaw.type)
+tooth_dum = dummy(SharkPartialData$tooth.position)
+
+varpart(allcoords, spec_dum, jawty_dum, tooth_dum)
+#this shows that tooth position explains more variation than species; jaw type> tooth position> species
+showvarparts(3)
+
+```
+
+----------------------------------------
+Ordination: CVA
+
+
+##Cva using Package Morpho; CVA of Upper and lower jaws as a predictor
+
+(this is what the RDA states as explaining the most variance)
+
+```{r}
+
+install.packages("Morpho")
+library(Morpho)
+
+allcoords = SharkPartialData[ , 7:34]
+
+factor_shark <- as.factor(paste(SharkPartialData$species, SharkPartialData$jaw.type, sep="_"))
+
+#RUN the CVA
+
+cva_shark <- CVA(allcoords, groups=factor_shark, weighting = TRUE, plot = TRUE,
+             rounds = 0, cv = FALSE, p.adjust.method = "none")
+
+cva_shark$Var
+cva_shark$Dist
+
+# get the typicality probabiliites and classifications - tagging specimens with a low probability < 0.01
+#as an outlier (unassigned) 
+
+typprob <- typprobClass(cva_shark$CVscores,groups=factor_shark)
+print(typprob)
+
+#classification accuracy is ~80%. It correctly assigned teeth to species
+#80% of the time. 
+
+```
+
+#Plotting the CV
+
+```{r}
+
+install.packages("car")
+require(car)
+
+#visualize CV scores by their groups 
+
+plot(cva_shark$CVscores, col=factor_shark, pch=as.numeric(factor_shark), typ="n",asp=1,
+xlab=paste("1st canonical axis", paste(round(cva_shark$Var[1,1],1),"%")),
+ylab=paste("2nd canonical axis", paste(round(cva_shark$Var[2,1],1),"%")))
+
+text(cva_shark$CVscores, as.character(factor_shark), col=as.numeric(factor_shark), cex=.7)
+
+#add elipses
+     for(ii in 1:length(levels(factor_shark))){
+        dataEllipse(cva_shark$CVscores[factor_shark==levels(factor_shark)[ii],1],
+          cva_shark$CVscores[factor_shark==levels(factor_shark)[ii],2], 
+          add=TRUE,levels=.80, col=c(1:7)[ii])
+  }
+
+#This does a much better job than the PC in distinguishing groups of species
+#for the upper and lower jaws. It also explains 20% more variance than the first
+#two pC's do. 
+----
+```
+
+This looks really messy so let's divide the species up a little bit.
+
+
+CV: non Car species
+```{r}
+
+#Look at the 3 species that are not Carcharhinus (Prionace, Rhizo, and Sphyrna)
+
+allcoords = SharkPartialData[ , 7:34]
+#edit out the rows that are Carcharhinus
+noncar<-SharkPartialData[-c(1:1181, 1230:1550, 1629:1964), ]
+
+#new data from of just Prionace, Rhizo, and Sphyrna
+
+View(noncar)
+noncarcoords <- noncar[ ,7:34]
+
+
+factor_noncar <- as.factor(paste(noncar$species, noncar$jaw.type, sep="_"))
+
+#RUN the CVA
+
+cva_nocar <- CVA(noncarcoords, groups=factor_noncar, weighting = TRUE, plot = TRUE,
+             rounds = 0, cv = FALSE, p.adjust.method = "none")
+
+cva_nocar$Var
+cva_nocar$Dist
+
+
+#visualize CVA
+
+plot(cva_nocar$CVscores, col=factor_noncar, pch=as.numeric(factor_noncar), typ="n",asp=1,
+xlab=paste("1st canonical axis", paste(round(cva_nocar$Var[1,1],1),"%")),
+ylab=paste("2nd canonical axis", paste(round(cva_nocar$Var[2,1],1),"%")))
+
+text(cva_nocar$CVscores, as.character(factor_noncar), col=as.numeric(factor_noncar), cex=.7)
+
+#add elipses
+     for(ii in 1:length(levels(factor_noncar))){
+        dataEllipse(cva_nocar$CVscores[factor_noncar==levels(factor_noncar)[ii],1],
+          cva_nocar$CVscores[factor_noncar==levels(factor_noncar)[ii],2], 
+          add=TRUE,levels=.80, col=c(1:7)[ii])
+  }
+
+  
+  
+```
+
+Now let's just look at just Carcharhinus species
+
+```{r}
+#data frame of just Carcharhinus species
+
+car<-SharkPartialData[c(1:1181, 1230:1550, 1629:1964), ]
+
+carcoords <- car[ ,7:34]
+
+factor_car <- as.factor(paste(car$species, car$jaw.type, sep="_"))
+
+
+
+#RUN the CVA
+
+cva_car <- CVA(carcoords, groups=factor_car, weighting = TRUE, plot = TRUE,
+             rounds = 0, cv = FALSE, p.adjust.method = "none")
+
+cva_car$Var
+cva_car$Dist
+
+
+#visualize CVA
+
+plot(cva_car$CVscores, col=factor_car, pch=as.numeric(factor_car), typ="n",asp=1,
+xlab=paste("1st canonical axis", paste(round(cva_car$Var[1,1],1),"%")),
+ylab=paste("2nd canonical axis", paste(round(cva_car$Var[2,1],1),"%")))
+
+text(cva_car$CVscores, as.character(factor_car), col=as.numeric(factor_car), cex=.7)
+
+#add elipses
+     for(ii in 1:length(levels(factor_car))){
+        dataEllipse(cva_car$CVscores[factor_car==levels(factor_car)[ii],1],
+          cva_car$CVscores[factor_car==levels(factor_car)[ii],2], 
+          add=TRUE,levels=.80, col=c(1:7)[ii])
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```
+
+
+
+
+```{r}
+library(lattice)
+
+#histogram showing the distribution of CA's among the species
+#and jaw types. explains 53% of overall variaion
+
+histogram(~cva_shark$CVscores[,1]|factor_shark,
+  layout=c(1,length(levels(factor_shark))),
+  xlab=paste("1st canonical axis", paste(round(cva_shark$Var[1,2],1),"%")))
+
+#histogram showing same thing for CA 2; 16.4% of overall variation
+
+histogram(~cva_shark$CVscores[,2]|factor_shark, 
+      layout=c(1,length(levels(factor_shark))),
+      xlab=paste("2nd canonical axis", paste(round(cva_shark$Var[2,2],1),"%")))
+
+
+#plot Mahalahobis; this will show the relationships between my groups
+
+dendroS=hclust(cva_shark$Dist$GroupdistMaha)
+dendroS$labels=levels(factor_shark)
+par(mar=c(4,4.5,1,1))
+dendroS=as.dendrogram(dendroS)
+plot(dendroS, main='',sub='', xlab="Shark Species and Jaw",
+     ylab='Mahalahobis distance')
+
+cva_shark$Dist
+
+# Variance explained by the canonical roots:
+
+cva_shark$Var
+# or plot it:
+barplot(cva_shark$Var[,2])
+
+#CV's do a very good job of explaining overall variation in the dataset.
+#much better than the PCA. 
+
+```
+
+-------------------------------------------------
+lDA
+
+#analyze the lda with the upper and lower jaws separated
+#LDA of Species, Upper and Lower Jaws Separated. 
+
+```{r}
+library(MASS)
+
+
+upperjaw<-SharkPartialData[SharkPartialData$jaw.type=="U",]
+lowerjaw<-SharkPartialData[SharkPartialData$jaw.type=="L",]
+
+upper_coords <- upperjaw[, 7:34]
+lower_coords <- lowerjaw[, 7:34]
+
+
+matrix_upper <- as.matrix(upper_coords)
+matrix_lower <- as.matrix(lower_coords)
+
+ 
+#Upper
+
+upperjaw_lda <- lda(matrix_upper, as.factor(upperjaw[ ,2]))
+plot(lda(matrix_upper, as.factor(upperjaw[ ,2])))
+
+#Here are the upper jaws, and the discriminant function is able to cluster #species
+#distinct from one another from the upper jaw teeth. Upper jaw teeth shape #are a clasifier
+#for identification to species
+#we can see that the lda detected collinear variables, which is probably why it 
+#couldn't distinguish between jaws and species. 
+
+
+#Lower
+
+lowerjaw_lda <- lda(matrix_lower, as.factor(lowerjaw[ ,2]))
+plot(lda(matrix_lower, as.factor(lowerjaw[ ,2])))
+
+
+
+
