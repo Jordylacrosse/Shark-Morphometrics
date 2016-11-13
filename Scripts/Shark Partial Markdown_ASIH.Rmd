@@ -271,7 +271,8 @@ cva_car$Dist
 
 plot(cva_car$CVscores, col=factor_car, pch=as.numeric(factor_car), typ="n",asp=1,
 xlab=paste("1st canonical axis", paste(round(cva_car$Var[1,1],1),"%")),
-ylab=paste("2nd canonical axis", paste(round(cva_car$Var[2,1],1),"%")))
+ylab=paste("2nd canonical axis", paste(round(cva_car$Var[2,1],1),"%")),
+xlim=c(-5, 5), ylim=c(-5, 5))
 
 text(cva_car$CVscores, as.character(factor_car), col=as.numeric(factor_car), cex=.7)
 
@@ -382,5 +383,52 @@ lowerjaw_lda <- lda(matrix_lower, as.factor(lowerjaw[ ,2]))
 plot(lda(matrix_lower, as.factor(lowerjaw[ ,2])))
 
 
+```
 
 
+
+#Mahalanobis Distance Between Upper jaws species and lower jaws species
+
+It takes into consideration the variance and correlation of the variables in measuring distances between points, i. e., differences in directions in which there is less variation within groups are given greater weight than are differences in directions in which there is more variation.
+
+```{r}
+
+upperjawmean <- upperjaw_lda$mean
+dist(predict(upperjaw_lda, upperjawmean)$x)
+
+#the mahaalanobis distance from each of the species shows they are 
+#easily distinguished from one another (the larger the number, the greater 
+#the greater the difference between the grous)
+
+
+lowerjawmean <- lowerjaw_lda$mean
+dist(predict(lowerjaw_lda, lowerjawmean )$x)
+
+#here there is significant difference between Ca and Cb as expressed by the
+#mahalanobis distance, along with Ca and Cf, however Cb and Cf are quite similar
+#due to the small distance measurement. THis shows that there is significant overlap
+#and similarities between the shape of lower jaw teeth of falciformis and #brevipinna. So there are not as good at predicting species by the shape of the
+#lower jaw teeth. 
+
+```
+
+##Mahalanobis Distance Between Shark Species
+
+
+```{r}
+
+#now let's compute the distances between mean groups in space defined by the #dis.functions
+#the compute the mahalanobis distance between groups (separating our species)
+
+meangroup <- shark_lda$mean
+dist(predict(shark_lda, meangroup)$x)
+
+#if we compute the same for the overall LDA of the data set, we can see the same
+#overlap occuring between Cf and Cb, and we can still see the clustering of Ca #separate from the other 2 species. The differences are skewed in here because
+#this is combining both the shape data for the upper and lower jaws. The previous
+#calculation (distance) separting out the jaw type is a better depiction 
+#of analyzing the shape data. And here we can see that the upper jaw teeth
+#are a better indication of identifying species than the lower jaw teeth,
+#since there is significant overlap with the lower jaw teeth .
+
+```

@@ -6,6 +6,8 @@ output: pdf_document
 #Read in the Shark data;  separating out the 3 species and jaw type for each sp.
 
 ```{r}
+library(vegan)
+library(dummies)
 
 sharkdat <- read.delim("~/Shark-Teeth-Morphometrics/sharkdat.txt")
 View(sharkdat)
@@ -193,6 +195,10 @@ points(x_avg_alt_upper, y_avg_alt_upper, pch=19, col='red') #mean plotted in red
 
 #do the same for the Lower Jaw
 
+plot(x_avg_alt_lower, y_avg_alt_lower)
+plot(x_avg_alt_lower, y_avg_alt_lower, pch=19, col='red')
+
+points(xydat_alti_lower$x, xydat_alti_lower$y)
 plot(x_avg_alt_lower, y_avg_alt_lower, pch=19, col='red', xlim=range(xydat_alti_lower$x), ylim=range(xydat_alti_lower$y))
 range(xydat_alti_lower$x)
 
@@ -224,7 +230,7 @@ The RDA serves the purpose of a MANOVA for my dataset .
 all_rda <- rda(coords ~ sharkdat$species + as.factor(sharkdat$jaw.type) +
                  as.factor(sharkdat$tooth.position))
 
-#after looking at several RDA's (looking at interactions and inclusion of #individuals) , this RDA outputs the most variance explained by the #independent variables. #the inclusion of individual was shown to have no effect.
+#after looking at several RDA's (looking at interactions and inclusion of #individuals) , this RDA outputs the most variance explained by the #independent variables. 
 
 anova(all_rda, permutations = 1000)
 anova(all_rda, by="margin")
@@ -248,7 +254,6 @@ jaw_dum = dummy(sharkdat$jaw.type)
 pos_dum = dummy(sharkdat$tooth.position)
 
 varpart(coords, sp_dum, jaw_dum, pos_dum)
-#this shows that tooth position explains more variation than species
 showvarparts(3)
 
 
@@ -281,8 +286,7 @@ biplot(pca_shark, cex=.5)
 pca_shark$loadings
 summary(pca_shark)
 #PCA 1 and 2 explain about 67% of the overall variance which also does a very
-#good job. however, PCA does not base this off of a priori groups. I wanted
-#to be able to see if species could be differentiated from one another. 
+#good job. however, PCA does not base this off of a priori groups. 
 
 
 
@@ -352,20 +356,11 @@ cva_1$Dist
 typprobs <- typprobClass(cva_1$CVscores,groups=factor)
 print(typprobs)
 
-#the classification accurracy of the CV is about 86%. This is extremely high
-#and shows that the separation among the teeth for each species is correct 
-#86% of the time. 
-
-#can see the model has a difficult time distinguishing between the falciformis
-#and brevipinna teeth from the lower jaw. These are 2 groups have a 
-#high probability of misclassifying the teeth
-
 ```
 
 #Plotting the CV
 
 ```{r}
-
 install.packages("car")
 require(car)
 
@@ -414,7 +409,6 @@ dendroS=as.dendrogram(dendroS)
 plot(dendroS, main='',sub='', xlab="Shark Species and Jaw",
      ylab='Mahalahobis distance')
 
-cva_1$Dist
 
 # Variance explained by the canonical roots:
 
@@ -539,9 +533,7 @@ dist(predict(shark_lda, meangroup)$x)
 #overlap occuring between Cf and Cb, and we can still see the clustering of Ca #separate from the other 2 species. The differences are skewed in here because
 #this is combining both the shape data for the upper and lower jaws. The previous
 #calculation (distance) separting out the jaw type is a better depiction 
-#of analyzing the shape data. And here we can see that the upper jaw teeth
-#are a better indication of identifying species than the lower jaw teeth,
-#since there is significant overlap with the lower jaw teeth .
+#of analyzing the shape data. 
 
 ```
 
@@ -549,10 +541,7 @@ dist(predict(shark_lda, meangroup)$x)
 #Clustering our Data Set; Cluster Analysis
 
 This emphasizes both differences and similarities among individual clusters
-by clustering these entities based on inter-entity resemblance. This technique
-is supporting what was previously found in the CVA. It notes that the optimal
-amount of clusters found is 6, which explain the most variation in the dataset,
-which is what the CVA was able to conclude. 
+by clustering these entities based on inter-entity resemblance. 
 
 #find optimal number of clusters for dataset
 
@@ -594,7 +583,28 @@ plot(pam(x=p[,1:28], k=6), main= "", col.p="black")
 #those formed from the upper and lower jaws of each species. (3 species)
 #Notice significant overlap which is most likely due to species similarity,
 #but we can see some good separation most likely due to jaw type (which 
-#does explain the most variation as seen in our RDA). 
+#does explain the most variation as seen in our RDA). So let's evaluate clustering
+#due to just 2 clusters, upper and lower jaw type. So this analysis confirms
+#our previous findings in the LDA analysis. Let's see if it does a better
+#job when we separate just to 2 clusters, which we saw in the PCA. 
+
+
+#Examine the same plot but examine Upper vs. Lower Teeth overlap
+#Upper teeth are indicated with a number 2, lower teeth with a number 1. 
+#Lower teeth in the first position are categorized in the upper jaw group
+#because they have a indentical shape form to those in the upper jaw.
+#clear separation is seen, overlap is due to similar teeth shapes of the first position teeth
+#of lower jaw with upper. 
+
+pam(x=p[,1:28], 2)$clustering
+plot(pam(x=p[,1:28], k=2), main= "", col.p="black")
+
+
+#confirms our previous findings that the jaws are the better descriptor 
+#of variation than are species. 
+#from here, using the upper jaws (since it is better to detect differences between species, let's analyze to see which landmark contributes to the most change
+#between the species, so which might be the cause of shape change between these 3 #spcies. )
+
 
 ```
 
@@ -602,7 +612,7 @@ plot(pam(x=p[,1:28], k=6), main= "", col.p="black")
 Since the upper jaw teeth are the most identifiable to species (more variable),
 let's 
 analyze where shape change is occuring in a single tooth relative to species.
-In  previous  studies, Garrick and Naylor noted that the 5th position tooth in the upper 
+In a previous  study, Naylor noted that the 5th position tooth in the upper 
 jaw is better to distinguish among species. By looking at just one tooth in the 
 upper jaw
 , we are now limiting shape change now to due to species. I want to see if 
@@ -740,10 +750,6 @@ apply(cbind(adist,bdist,fdist),1,sd)
 
 #so we can see that the 4th landmark (the tip of the blade) contributes to
 #the most change in shape with regards to species in the upper jaw.
-#we can see a considerable amount of variation due to landmark 3, 10, and 13 as well.
-
-#this could also be done for the same position in the lower jaw, however, the LDA 
-#expressed significant overlap. Therefore, I am leaving this analysis to only 
-#the upper jaw since these are the best descriptors of species. 
+#we can see a considerable amount of variation due to landmark 3, 10, and 13 as well. 
 
 ```
