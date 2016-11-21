@@ -268,6 +268,119 @@ barplot(cva_1$Var[,2])
 
 ```
 
+
+#Mahalanobis Distance Between Upper jaws species and lower jaws species
+
+It takes into consideration the variance and correlation of the variables in measuring distances between points, i. e., differences in directions in which there is less variation within groups are given greater weight than are differences in directions in which there is more variation.
+
+```{r}
+
+uppermean <- upper_lda$mean
+dist(predict(upper_lda, uppermean)$x)
+
+#the mahaalanobis distance from each of the species shows they are 
+#easily distinguished from one another (the larger the number, the greater 
+#the greater the difference between the grous)
+
+
+lowermean <- lower_lda$mean
+dist(predict(lower_lda, lowermean )$x)
+
+#here there is significant difference between Ca and Cb as expressed by the
+#mahalanobis distance, along with Ca and Cf, however Cb and Cf are quite similar
+#due to the small distance measurement. THis shows that there is significant overlap
+#and similarities between the shape of lower jaw teeth of falciformis and #brevipinna. So there are not as good at predicting species by the shape of the
+#lower jaw teeth. 
+
+```
+
+
+
+Similar to what Gavin did, looked at bivariate plots of the species that had little
+separation (small differences). Doing something similar but also want to look at
+the Lamnid lineage
+
+#Evaluate distinct clusers; lamnid (unique group) and poor separation groups
+
+```{r}
+
+#lamnid lineage jaws separated
+
+lamnid<- ExtantData[ExtantData$species %in% c("Ip", "Io", "Gw"), ]
+
+lamnid_coords <- lamnid[ , 7:34]
+
+lamnid_factor <- as.factor(paste(lamnid$species, lamnid$jaw.type, sep="_"))
+
+cva_lamnid <- CVA(lamnid_coords, groups=lamnid_factor, weighting = TRUE, plot = TRUE,
+             rounds = 0, cv = TRUE, p.adjust.method = "none")
+
+plot(cva_lamnid$CVscores, col=factor, pch=as.numeric(lamnid_factor), typ="n",asp=1,
+xlab=paste("1st canonical axis", paste(round(cva_lamnid$Var[1,1],1),"%")),
+ylab=paste("2nd canonical axis", paste(round(cva_lamnid$Var[2,1],1),"%")))
+
+text(cva_lamnid$CVscores, as.character(lamnid_factor), col=as.numeric(lamnid_factor), cex=.7)
+```
+
+#poor separation in lower jaws of Cg, Cl, ca, Cp
+```{r}
+
+
+lowerjaw<-ExtantData[ExtantData$jaw.type=="L",]
+
+
+Requ<-lowerjaw[lowerjaw$species %in% c("Cg", "Cl", "ca", "Cp"), ]
+Requ_coords<- Requ[ , 7:34]
+
+Requ_factor <- as.factor(paste(Requ$species, sep="_"))
+
+cva_Requ <- CVA(Requ_coords, groups=Requ_factor, weighting = TRUE, plot = TRUE,
+             rounds = 0, cv = TRUE, p.adjust.method = "none")
+
+plot(cva_Requ$CVscores, col=Requ_factor, pch=as.numeric(Requ_factor), typ="n",asp=1,
+xlab=paste("1st canonical axis", paste(round(cva_Requ$Var[1,1],1),"%")),
+ylab=paste("2nd canonical axis", paste(round(cva_Requ$Var[2,1],1),"%")))
+
+text(cva_Requ$CVscores, as.character(Requ_factor), col=as.numeric(Requ_factor), cex=.7)
+
+cva_Requ$Dist
+
+#interestingly enough, even though this group of tooth shape shows the smallest separation,
+#they are still distinct from one another, with the exception of "ca"
+
+```
+
+#poor separation in the upper jaws of Cu, Cg, and Co
+
+```{r}
+
+upperjaw<-ExtantData[ExtantData$jaw.type=="U",]
+
+
+ReqU<-upperjaw[upperjaw$species %in% c("Cu", "Cg", "Co"), ]
+ReqU_coords<- ReqU[ , 7:34]
+
+ReqU_factor <- as.factor(paste(ReqU$species, sep="_"))
+
+cva_ReqU <- CVA(ReqU_coords, groups=ReqU_factor, weighting = TRUE, plot = TRUE,
+             rounds = 0, cv = TRUE, p.adjust.method = "none")
+
+plot(cva_ReqU$CVscores, col=ReqU_factor, pch=as.numeric(ReqU_factor), typ="n",asp=1,
+xlab=paste("1st canonical axis", paste(round(cva_ReqU$Var[1,1],1),"%")),
+ylab=paste("2nd canonical axis", paste(round(cva_ReqU$Var[2,1],1),"%")))
+
+text(cva_ReqU$CVscores, as.character(ReqU_factor), col=as.numeric(ReqU_factor), cex=.7)
+
+cva_ReqU$Dist
+
+
+#again, pretty decent separation with little overlap. 
+
+```
+
+
+
+
 ##LDA (all sharks)
 
 ```{r}
@@ -300,9 +413,22 @@ plot(shark_lda, col = 'blue')
 
 ```
 
+##Mahalanobis Distance Between Shark Species
+
+
+```{r}
+
+#now let's compute the distances between mean groups in space defined by the #dis.functions
+#the compute the mahalanobis distance between groups (separating our species)
+
+meangroup <- shark_lda$mean
+dist(predict(shark_lda, meangroup)$x)
+
 
 #Plotting tooth by position
-for the x coordinate only of the 4th position tooth which 
+#for the x coordinate only of the 4th position tooth which 
+```
+
 
 ```{r}
 #acronotus
@@ -314,7 +440,7 @@ shark2<- upper_acronotus[12:22,]
 
 #upper jaw
 
-plot(shark2$ProcCoord7~shark2$tooth.position, main="tooth position by shape", 
+plot(shark2$ProcCoord7~shark2$tooth.position, main="tooth position by shape upper", 
   	xlab="position", ylab="shape")
 
 #lower jaw
@@ -322,7 +448,7 @@ plot(shark2$ProcCoord7~shark2$tooth.position, main="tooth position by shape",
 lower_acronotus <- acronotus[acronotus$jaw.type=="L",]
 shark3<- lower_acronotus[12:22,]
 
-plot(shark3$ProcCoord7~shark3$tooth.position, main="tooth position by shape", 
+plot(shark3$ProcCoord7~shark3$tooth.position, main="tooth position by shape lower", 
   	xlab="position", ylab="shape")
 
 
@@ -335,11 +461,11 @@ lower_leucas <- leucas[leucas$jaw.type=="L",]
 bull2<- lower_leucas[12:22,]
 
 #upper jaw
-plot(bull1$ProcCoord7~bull1$tooth.position, main="tooth position by shape", 
+plot(bull1$ProcCoord7~bull1$tooth.position, main="tooth position by shape upper", 
   	xlab="position", ylab="shape")
 
 #lower jaw
-plot(bull2$ProcCoord7~bull2$tooth.position, main="tooth position by shape", 
+plot(bull2$ProcCoord7~bull2$tooth.position, main="tooth position by shape lower", 
   	xlab="position", ylab="shape")
 ```
 
@@ -348,28 +474,30 @@ plot(bull2$ProcCoord7~bull2$tooth.position, main="tooth position by shape",
 ```{r}
 #this shows the shape trend for the upper jaw teeth and the lower jaw teeth
 #by tooth position as you move from the anterior to the posterior part of the jaw
+#for all sharks in the study. These 4 plots show similar trends of the 
+#tooth shape with regards to tooth position. 
 
 upperjaw<-ExtantData[ExtantData$jaw.type=="U",]
 lowerjaw<-ExtantData[ExtantData$jaw.type=="L",]
 
+#procrustes coord 7 upper
 plot(upperjaw$ProcCoord7~upperjaw$tooth.position, main="tooth position/ shape Upper", 
   	xlab="position", ylab="landmark 4x")
 
+#procrustes coord 7 lower
 plot(lowerjaw$ProcCoord7~lowerjaw$tooth.position, main="tooth position/ shape Lower", 
   	xlab="position", ylab="landmark 4x")
 
-
+#procrustes coord 8 upper
 plot(upperjaw$ProcCoord8~upperjaw$tooth.position, main="tooth position/ shape Upper", 
   	xlab="position", ylab="landmark 4y")
 
+#procrustes coord 8 lower
 plot(lowerjaw$ProcCoord8~lowerjaw$tooth.position, main="tooth position/ shape Lower", 
   	xlab="position", ylab="landmark 4y")
 
 
 ```
-
-
-
 
 
 #LDA of Upper and Lower Jaws Separated. 
@@ -397,43 +525,6 @@ plot(lda(matshark_lower, as.factor(lowerjaw[ ,2])))
 ```
 
 
-#Mahalanobis Distance Between Upper jaws species and lower jaws species
-
-It takes into consideration the variance and correlation of the variables in measuring distances between points, i. e., differences in directions in which there is less variation within groups are given greater weight than are differences in directions in which there is more variation.
-
-```{r}
-
-uppermean <- upper_lda$mean
-dist(predict(upper_lda, uppermean)$x)
-
-#the mahaalanobis distance from each of the species shows they are 
-#easily distinguished from one another (the larger the number, the greater 
-#the greater the difference between the grous)
-
-
-lowermean <- lower_lda$mean
-dist(predict(lower_lda, lowermean )$x)
-
-#here there is significant difference between Ca and Cb as expressed by the
-#mahalanobis distance, along with Ca and Cf, however Cb and Cf are quite similar
-#due to the small distance measurement. THis shows that there is significant overlap
-#and similarities between the shape of lower jaw teeth of falciformis and #brevipinna. So there are not as good at predicting species by the shape of the
-#lower jaw teeth. 
-
-```
-
-##Mahalanobis Distance Between Shark Species
-
-
-```{r}
-
-#now let's compute the distances between mean groups in space defined by the #dis.functions
-#the compute the mahalanobis distance between groups (separating our species)
-
-meangroup <- shark_lda$mean
-dist(predict(shark_lda, meangroup)$x)
-
-```
 
 
 #Clustering our Data Set; Cluster Analysis
