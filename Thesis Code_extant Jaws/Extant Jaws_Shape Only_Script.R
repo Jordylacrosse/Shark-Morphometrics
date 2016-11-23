@@ -50,7 +50,7 @@ xydat_acronotus_upper <- get_xydat(upper_acronotus_coord)
 lower_acronotus_coord <- lower_acronotus[ ,7:34 ]
 xydat_acronotus_lower <- get_xydat(lower_acronotus_coord)
 
-
+----------------------------------------------------------------------
 
 #altimus
 
@@ -70,7 +70,61 @@ xydat_altimus_upper <- get_xydat(upper_altimus_coord)
 lower_altimus_coord <- lower_altimus[ ,7:34 ]
 xydat_altimus_lower <- get_xydat(lower_altimus_coord)
 
+#Mean Upper and Lower Jaw Coordinates for Altimus. 
 
+
+#find the mean of x and y for each landmark position
+#mean coordinates for altimus upper jaw
+
+x_avg_alt_upper = tapply(xydat_altimus_upper$x, xydat_altimus_upper$landmark, mean)
+y_avg_alt_upper = tapply(xydat_altimus_upper$y, xydat_altimus_upper$landmark, mean)
+
+
+#mean coordinates for lower jaw of altimus
+
+x_avg_alt_lower <- tapply(xydat_altimus_lower$x, xydat_altimus_lower$landmark, mean)
+y_avg_alt_lower <- tapply(xydat_altimus_lower$y, xydat_altimus_lower$landmark, mean)
+
+#This gives you the mean coordinate for each landmark found on both the #upper and lower jaw teeth. Allows us to plot the overall shape (next step)
+#mean shape, and analyze the distribution of landmarks between tooth 
+#positions for upper and lower jaw teeth of altimus. This can be done
+#for all jaws for all species, but this is just for visual sake. 
+
+
+##average shape of Upper and lower jaw of Car. Altimus
+#Upper Jaw
+
+plot(x_avg_alt_upper, y_avg_alt_upper, pch=19, col='red', xlim=range(xydat_alti_upper$x), ylim=range(xydat_alti_upper$y)) #plot of mean shape. mean of each landmark
+range(xydat_alti_upper$x)
+
+points(xydat_alti_upper$x, xydat_alti_upper$y) #all landmarks ploted
+plot(xydat_alti_upper$x, xydat_alti_upper$y)
+points(x_avg_alt_upper, y_avg_alt_upper, pch=19, col='red') #mean plotted in red
+
+#plot the mean shape of upper jaw teeth of altimus in Red, and the black 
+#points represent the distribution of coordinates around each landmark.
+#these are due to positional variation (position of tooth in the jaw. 
+#indicated in data set by tooth.position in sharkdat)
+
+
+#do the same for the Lower Jaw
+
+plot(x_avg_alt_lower, y_avg_alt_lower, pch=19, col='red', xlim=range(xydat_alti_lower$x), ylim=range(xydat_alti_lower$y))
+range(xydat_alti_lower$x)
+
+points(xydat_alti_lower$x, xydat_alti_lower$y)
+plot(xydat_alti_lower$x, xydat_alti_lower$y)
+points(x_avg_alt_lower, y_avg_alt_lower, pch=19, col='red')
+
+#when we do the same thing for the lower jaw of altimus, we can see that
+#(visually) that the mean shape changes due to the jaw type *lower* and 
+#the distribution of coordinates around each landmark changes. 
+
+#we could do this same visual technique to analyze shape change for each species,
+#but the focus is to look at shape change between the species. Not positional 
+#change.
+
+----------------------------------------------------------------------
 
 #BREVIPINNA
 
@@ -88,7 +142,7 @@ xydat_brevi_upper <-  get_xydat(upper_brevi_coord) #xy data upper brevi teeth
 lower_brevi_coord <- lower_brevi[ ,7:34]
 xydat_brevi_lower <- get_xydat(lower_brevi_coord) #xy data lower brevi teeth
 
-
+----------------------------------------------------------------------
 #FALCIFORMIS
 
 #subset upper and lower jaws for falciformis
@@ -105,6 +159,9 @@ xydat_falci_upper <- get_xydat(upper_falci_coord) #xy data for just upper jaw of
 lower_falci_coord <- lower_falci[ ,7:34]
 xydat_falci_lower <- get_xydat(lower_falci_coord) #xy data for lower jaw of falci
 
+
+----------------------------------------------------------------------
+  
 #Longimanus
 
 upper_longimanus <- longimanus[longimanus$jaw.type=="U",]
@@ -119,6 +176,7 @@ xydat_longimanus_upper <- get_xydat(upper_longimanus_coord) #xy data for just up
 lower_longimanus_coord <- lower_longimanus[ ,7:34]
 xydat_longimanus_lower <- get_xydat(lower_longimanus_coord) #xy data for lower jaw of longimanus
 
+----------------------------------------------------------------------
 
 #Leucas
 
@@ -138,9 +196,11 @@ xydat_leucas_upper <- get_xydat(upper_leucas_coord)
 lower_leucas_coord <- lower_leucas[ ,7:34 ]
 xydat_leucas_lower <- get_xydat(lower_leucas_coord)
 
+----------------------------------------------------------------------
 
 #prionace
 
+  
 upper_prionace <- prionace[prionace$jaw.type=="U",]
 lower_prionace <- prionace[prionace$jaw.type=="L",]
 
@@ -157,9 +217,11 @@ xydat_prionace_upper <- get_xydat(upper_prionace_coord)
 lower_prionace_coord <- lower_prionace[ ,7:34 ]
 xydat_prionace_lower <- get_xydat(lower_prionace_coord)
 
+----------------------------------------------------------------------
 
 #lewini
 
+  
 upper_lewini <- lewini[lewini$jaw.type=="U",]
 lower_lewini <- lewini[lewini$jaw.type=="L",]
 
@@ -177,9 +239,11 @@ lower_lewini_coord <- lower_lewini[ ,7:34 ]
 xydat_lewini_lower <- get_xydat(lower_lewini_coord)
 
 
+----------------------------------------------------------------------
 
 #rhizo
 
+  
 
 upper_rhizo <- rhizo[rhizo$jaw.type=="U",]
 lower_rhizo <- rhizo[rhizo$jaw.type=="L",]
@@ -197,9 +261,12 @@ xydat_rhizo_upper <- get_xydat(upper_rhizo_coord)
 lower_rhizo_coord <- lower_rhizo[ ,7:34 ]
 xydat_rhizo_lower <- get_xydat(lower_rhizo_coord)
 
+----------------------------------------------------------------------
 
 #isodon
 
+  
+  
 upper_isodon <- isodon[isodon$jaw.type=="U",]
 lower_isodon <- isodon[isodon$jaw.type=="L",]
 
@@ -216,7 +283,7 @@ xydat_isodon_upper <- get_xydat(upper_isodon_coord)
 lower_isodon_coord <- lower_isodon[ ,7:34 ]
 xydat_isodon_lower <- get_xydat(lower_isodon_coord)
 
-
+----------------------------------------------------------------------
 
 #limbatus
 
@@ -236,6 +303,7 @@ xydat_limbatus_upper <- get_xydat(upper_limbatus_coord)
 lower_limbatus_coord <- lower_limbatus[ ,7:34 ]
 xydat_limbatus_lower <- get_xydat(lower_limbatus_coord)
 
+----------------------------------------------------------------------
 
 #obscurus
 
@@ -255,7 +323,7 @@ xydat_obscurus_upper <- get_xydat(upper_obscurus_coord)
 lower_obscurus_coord <- lower_obscurus[ ,7:34 ]
 xydat_obscurus_lower <- get_xydat(lower_obscurus_coord)
 
-
+----------------------------------------------------------------------
 
 #plumbeus
 
@@ -276,14 +344,14 @@ xydat_plumbeus_upper <- get_xydat(upper_plumbeus_coord)
 lower_plumbeus_coord <- lower_plumbeus[ ,7:34 ]
 xydat_plumbeus_lower <- get_xydat(lower_plumbeus_coord)
 
-
+----------------------------------------------------------------------
 
 #tarus
 
 
 
 
-
+  ----------------------------------------------------------------------
 
 #white
 
@@ -303,7 +371,7 @@ xydat_white_upper <- get_xydat(upper_white_coord)
 lower_white_coord <- lower_white[ ,7:34 ]
 xydat_white_lower <- get_xydat(lower_white_coord)
 
-
+----------------------------------------------------------------------
 
 #oxy
 
@@ -323,7 +391,8 @@ xydat_oxy_upper <- get_xydat(upper_oxy_coord)
 lower_oxy_coord <- lower_oxy[ ,7:34 ]
 xydat_oxy_lower <- get_xydat(lower_oxy_coord)
 
-
+----------------------------------------------------------------------
+  
 #tiburo
 
 upper_tiburo <- tiburo[tiburo$jaw.type=="U",]
@@ -342,6 +411,7 @@ xydat_tiburo_upper <- get_xydat(upper_tiburo_coord)
 lower_tiburo_coord <- lower_tiburo[ ,7:34 ]
 xydat_tiburo_lower <- get_xydat(lower_tiburo_coord)
 
+----------------------------------------------------------------------
 
 #paucus
 
@@ -389,62 +459,6 @@ xydat_paucus_lower <- get_xydat(lower_paucus_coord)
 
 
 
-#Mean Upper and Lower Jaw Coordinates for Altimus. 
 
-```{r}
-#find the mean of x and y for each landmark position
-#mean coordinates for altimus upper jaw
-
-x_avg_alt_upper = tapply(xydat_alti_upper$x, xydat_alti_upper$landmark, mean)
-y_avg_alt_upper = tapply(xydat_alti_upper$y, xydat_alti_upper$landmark, mean)
-
-
-#mean coordinates for lower jaw of altimus
-
-x_avg_alt_lower <- tapply(xydat_alti_lower$x, xydat_alti_lower$landmark, mean)
-y_avg_alt_lower <- tapply(xydat_alti_lower$y, xydat_alti_lower$landmark, mean)
-
-#This gives you the mean coordinate for each landmark found on both the #upper and lower jaw teeth. Allows us to plot the overall shape (next step)
-#mean shape, and analyze the distribution of landmarks between tooth 
-#positions for upper and lower jaw teeth of altimus. This can be done
-#for all jaws for all species, but this is just for visual sake. 
-
-```
-
-
-##average shape of Upper and lower jaw of Car. Altimus
-
-```{r}
-#Upper Jaw
-
-plot(x_avg_alt_upper, y_avg_alt_upper, pch=19, col='red', xlim=range(xydat_alti_upper$x), ylim=range(xydat_alti_upper$y)) #plot of mean shape. mean of each landmark
-range(xydat_alti_upper$x)
-
-points(xydat_alti_upper$x, xydat_alti_upper$y) #all landmarks ploted
-plot(xydat_alti_upper$x, xydat_alti_upper$y)
-points(x_avg_alt_upper, y_avg_alt_upper, pch=19, col='red') #mean plotted in red
-
-#plot the mean shape of upper jaw teeth of altimus in Red, and the black 
-#points represent the distribution of coordinates around each landmark.
-#these are due to positional variation (position of tooth in the jaw. 
-#indicated in data set by tooth.position in sharkdat)
-
-
-#do the same for the Lower Jaw
-
-plot(x_avg_alt_lower, y_avg_alt_lower, pch=19, col='red', xlim=range(xydat_alti_lower$x), ylim=range(xydat_alti_lower$y))
-range(xydat_alti_lower$x)
-
-points(xydat_alti_lower$x, xydat_alti_lower$y)
-plot(xydat_alti_lower$x, xydat_alti_lower$y)
-points(x_avg_alt_lower, y_avg_alt_lower, pch=19, col='red')
-
-#when we do the same thing for the lower jaw of altimus, we can see that
-#(visually) that the mean shape changes due to the jaw type *lower* and 
-#the distribution of coordinates around each landmark changes. 
-
-#we could do this same visual technique to analyze shape change for each species,
-#but the focus is to look at shape change between the species. Not positional 
-#change.
 
 ```
