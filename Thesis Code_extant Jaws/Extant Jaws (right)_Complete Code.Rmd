@@ -427,7 +427,7 @@ dist(predict(shark_lda, meangroup)$x)
 #for the x coordinate only of the 4th position tooth which 
 ```
 
-
+#Shape by tooth position (for distinct species)
 ```{r}
 #acronotus
 

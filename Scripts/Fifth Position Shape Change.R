@@ -199,47 +199,67 @@ points(x_avg_St5, y_avg_St5, pch=19, col='dodgerblue4')
 
 ##Calculate the distance between those landmarks
 
-The distance between two landmarks is the square root of the sum of the 
-squared differences between each landmark. (Euclidean distance)
-This allows us to calculate a single value distance from one landmark to the 
-next in each species, so then we can use these to compare to the next species.
-We are going to calculate the Euclidean distance because it is a coordinate free approach for comparing biological shapes using landmark data.
+#The distance between two landmarks is the square root of the sum of the 
+#squared differences between each landmark. (Euclidean distance)
+#This allows us to calculate a single value distance from one landmark to the 
+#next in each species, so then we can use these to compare to the next species.
+#We are going to calculate the Euclidean distance because it is a coordinate free approach for comparing biological shapes using landmark data.
 
-```{r}
 
 #matrix of each species, upper jaw
 
-alti <- cbind(x_avg_a5, y_avg_a5) #red
-brevi <- cbind(x_avg_b5, y_avg_b5) #blue
-falci <- cbind(x_avg_f5, y_avg_f5) #grenen
+acro <- cbind(x_avg_Ca5, y_avg_Ca5) 
+alti <- cbind(x_avg_ca5, y_avg_ca5)
+brevi <- cbind(x_avg_Cb5, y_avg_Cb5)
+falci <- cbind(x_avg_Cf5, y_avg_Cf5) 
+prio <- cbind(x_avg_Pg5, y_avg_Pg5)
+iso<- cbind(x_avg_Ci5, y_avg_Ci5)
+leuc<- cbind(x_avg_Cu5, y_avg_Cu5)
+lew<- cbind(x_avg_Sl5, y_avg_Sl5)
+limb<- cbind(x_avg_Cl5, y_avg_Cl5)
+long<- cbind(x_avg_Cg5, y_avg_Cg5)
+obscur<- cbind(x_avg_Co5, y_avg_Co5)
+rinch<- cbind(x_avg_Io5, y_avg_Io5)
+pauc<- cbind(x_avg_Ip5, y_avg_Ip5)
+blum<- cbind(x_avg_Cp5, y_avg_Cp5)
+rhz<- cbind(x_avg_Rt5, y_avg_Rt5)
+tib<- cbind(x_avg_St5, y_avg_St5)
+
+
+
+
 mean_5 <- cbind(x_avg_m5, y_avg_m5) #grey
 
 #calculate the interlandmark distance between each landmark, for each species
 #and for the mean
 #(i.e: distance between landmark 1>2>3>4>5>6...14)
 
-dist_alti <- vegdist(alti, method="euclidean")
-dist_alti <- vegdist(brevi, method="euclidean")
-dist_alti <- vegdist(falci, method="euclidean")
+dist_acro <- vegdist(acro, method="euclidean")
+dist_brevi <- vegdist(brevi, method="euclidean")
+dist_falci <- vegdist(falci, method="euclidean")
 
 dist_mean <- vegdist(mean_5, method="euclidean")
 
-```
 
-compare to see how these distances differ from the mean (which landmarks attribute
-                                                         to the greatest change per/ species.) 
+#compare to see how these distances differ from the mean (which landmarks attribute
+    #to the greatest change per/ species.) 
+
 
 ##Euclidean distance of species from mean (upper jaw, 5th pos.)
 
-I want to see what landmarks are attributing to the most change in tooth shape
-for each species ( from mean reference shape, to target shape:species)
+#I want to see what landmarks are attributing to the most change in tooth shape
+#for each species ( from mean reference shape, to target shape:species)
 
-Shape change in the 5th position, upper jaw only
 
-```{r}
 
-#difference of altimus from mean
-apply(mean_5 - alti,1,function(x){sqrt(x[1]^2+x[2]^2)})
+
+
+#Shape change in the 5th position, upper jaw only
+
+
+
+#difference of acronotus from mean
+apply(mean_5 - acro,1,function(x){sqrt(x[1]^2+x[2]^2)})
 
 #difference of brevipinna from mean
 apply(mean_5 - brevi,1,function(x){sqrt(x[1]^2+x[2]^2)})
@@ -248,8 +268,7 @@ apply(mean_5 - brevi,1,function(x){sqrt(x[1]^2+x[2]^2)})
 apply(mean_5 - falci,1,function(x){sqrt(x[1]^2+x[2]^2)})
 
 
-adist = apply(mean_5 - alti,1,function(x){sqrt(x[1]^2+x[2]^2)})
-bdist = apply(mean_5 - alti,1,function(x){sqrt(x[1]^2+x[2]^2)})
+adist = apply(mean_5 - acro,1,function(x){sqrt(x[1]^2+x[2]^2)})
 bdist = apply(mean_5 - brevi,1,function(x){sqrt(x[1]^2+x[2]^2)})
 fdist = apply(mean_5 - falci,1,function(x){sqrt(x[1]^2+x[2]^2)})
 cbind(adist,bdist,fdist)
@@ -264,4 +283,9 @@ apply(cbind(adist,bdist,fdist),1,sd)
 #expressed significant overlap. Therefore, I am leaving this analysis to only 
 #the upper jaw since these are the best descriptors of species. 
 
-```
+
+
+
+
+
+#find the interlandmark distance between very similar species (tooth shape)
