@@ -87,6 +87,7 @@ head(all_coords)
 
 upper_coords <- upperjaw[, 7:34]
 lower_coords <- lowerjaw[, 7:34]
+
 ```
 
 #RDA
@@ -159,7 +160,30 @@ plot(pca_shark)
 #jaw teeth separated from one another. #there are too many data points in 
 #the full data set to see if species cluster together separately in the 
 #upper and lower jaws. 
+
 ```
+
+
+Won't work if you try to plot PCA by tooth position
+```{r}
+
+acronotus <- ExtantData[ExtantData$species=="Ca",]
+upper_acronotus <- acronotus[acronotus$jaw.type=="U",]
+lower_acronotus <- acronotus[acronotus$jaw.type=="L",]
+
+upper_acronotus_coord <- upper_acronotus[ ,7:34 ]
+lower_acronotus_coord <- lower_acronotus[ ,7:34 ]
+
+acronotus$tooth.position
+
+testpca$loadings
+
+
+
+
+
+```
+
 
 #CVA
 ```{r}
@@ -176,10 +200,12 @@ allcoords = ExtantData[ , 7:34]
 
 factor <- as.factor(paste(ExtantData$species, ExtantData$jaw.type, sep="_"))
 
+
 #RUN the CVA
 
 cva_1 <- CVA(allcoords, groups=factor, weighting = TRUE, plot = TRUE,
              rounds = 0, cv = FALSE, p.adjust.method = "none")
+
 
 cva_1$Var
 cva_1$Dist
@@ -268,6 +294,36 @@ barplot(cva_1$Var[,2])
 
 ```
 
+#CVA by tooth position
+
+To look at changes with respect to tooth
+position
+
+I did this in morphoJ with species, jaw type, and tooth position as classifiers.
+The strongest one with the most signal is with species, jaw type, and tooth position
+if we color the data points just with respect to jaw type, we can see clear separation
+then if we color the data points with respect to species, we can see a lot of 
+overlap, as expected but if we color the points with respect to tooth position
+we see the progression of the reciprocal movement in the points with 
+respect tooth position.
+
+This CVA explains 89% of the overall variation!! Hey, that's pretty awesome.
+
+*still trying to figure out the R script for this part.
+
+```{r}
+toothset <-ExtantData[ExtantData$species %in% c("Ip", "Io", "Ca", "ca", "Cb", "Cf", "Pg,", "Ci", "Cu","Sl", "Cl", "Cg", "Co", "Cp", "Rt", "St" ), ]
+
+toothchords <- toothset[ ,7:34]
+factor2 <- as.factor(paste(toothset$tooth.position, toothset$jaw.type, sep="_"))
+
+cva_try <- CVA(toothset[ ,7:34], groups=factor2, weighting = TRUE, plot = TRUE,
+              rounds = 0, cv = FALSE, p.adjust.method = "none")
+
+
+```
+
+
 
 #Mahalanobis Distance Between Upper jaws species and lower jaws species
 
@@ -275,30 +331,31 @@ It takes into consideration the variance and correlation of the variables in mea
 
 ```{r}
 
-uppermean <- upper_lda$mean
-dist(predict(upper_lda, uppermean)$x)
+toothset <-ExtantData[ExtantData$species %in% c("Ip", "Io", "Ca", "ca", "Cb", "Cf", "Pg,", "Ci", "Cu","Sl", "Cl", "Cg", "Co", "Cp", "Rt", "St" ), ]
 
-#the mahaalanobis distance from each of the species shows they are 
-#easily distinguished from one another (the larger the number, the greater 
-#the greater the difference between the grous)
+upperset<-toothset[toothset$jaw.type=="U",]
+lowerset<-toothset[toothset$jaw.type=="L",]
+
+chordsU <- upperset[,7:34]
+chordsL <-lowerset[,7:34]
+
+matrix_upper <- as.matrix(chordsU)
+matrix_lower <- as.matrix(chordsL)
+
+practice_lda <- lda(matrix_upper, as.factor(upperset[ ,2]))
+plot(lda(matrix_upper, as.factor(upperset[ ,2])), lower.panel= NULL)
+
+#now I want to look at plots individually, but I don't know how?
 
 
-lowermean <- lower_lda$mean
-dist(predict(lower_lda, lowermean )$x)
-
-#here there is significant difference between Ca and Cb as expressed by the
-#mahalanobis distance, along with Ca and Cf, however Cb and Cf are quite similar
-#due to the small distance measurement. THis shows that there is significant overlap
-#and similarities between the shape of lower jaw teeth of falciformis and #brevipinna. So there are not as good at predicting species by the shape of the
-#lower jaw teeth. 
 
 ```
 
 
 
-Similar to what Gavin did, looked at bivariate plots of the species that had little
+Look at bivariate plots of the species that had little
 separation (small differences). Doing something similar but also want to look at
-the Lamnid lineage
+the Lamnid lineage. (Similar to Naylor 1994)
 
 #Evaluate distinct clusers; lamnid (unique group) and poor separation groups
 
