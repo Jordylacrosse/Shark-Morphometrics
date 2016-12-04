@@ -91,6 +91,7 @@ lower_coords <- lowerjaw[, 7:34]
 ```
 
 #RDA
+RDA can also be considered a constrained version of principal components analysis (PCA), wherein canonical axes - built from linear combinations of response variables - must also be linear combinations of the explanatory variables (i.e. fitted by MLR). is a method to extract and summarise the variation in a set of response variables that can be explained by a set of explanatory variables. More accurately, RDA is a direct gradient analysis technique which summarises linear relationships between components of response variables that are "redundant" with (i.e. "explained" by) a set of explanatory variables (very similar to a MANOVA)
 
 ```{r}
 #What is the effect of species, jaw type, and tooth position on overall variation?
@@ -164,7 +165,8 @@ plot(pca_shark)
 ```
 
 
-Won't work if you try to plot PCA by tooth position
+#PCA by tooth position
+doesn't give me the output I'm looking for. (did this with CVA in MorphoJ)
 ```{r}
 
 acronotus <- ExtantData[ExtantData$species=="Ca",]
@@ -177,9 +179,6 @@ lower_acronotus_coord <- lower_acronotus[ ,7:34 ]
 acronotus$tooth.position
 
 testpca$loadings
-
-
-
 
 
 ```
@@ -211,7 +210,7 @@ cva_1$Var
 cva_1$Dist
 
 # get the typicality probabiliites and classifications - tagging specimens with a low probability < 0.01
-#as an outlie (unassigned) 
+#as an outlier (unassigned) 
 
 typprobs <- typprobClass(cva_1$CVscores,groups=factor)
 print(typprobs)
@@ -220,9 +219,8 @@ print(typprobs)
 #and shows that the separation among the teeth for each species is correct 
 #86% of the time. 
 
-#can see the model has a difficult time distinguishing between the falciformis
-#and brevipinna teeth from the lower jaw. These are 2 groups have a 
-#high probability of misclassifying the teeth
+#I need to see Dan about debugging the 0's in this to get a better estimate of the
+#classification accuracy
 
 ```
 
@@ -251,22 +249,6 @@ text(cva_1$CVscores, as.character(factor), col=as.numeric(factor), cex=.7)
 #This does a much better job than the PC in distinguishing groups of species
 #for the upper and lower jaws. It also explains 20% more variance than the first
 #two pC's do. However, it's pretty messy. I want to look at this for just upper and just for lower jaws. 
-
-
-library(lattice)
-
-#histogram showing the distribution of CA's among the species
-#and jaw types. explains 66% of overall variaion
-
-histogram(~cva_1$CVscores[,1]|factor,
-  layout=c(1,length(levels(factor))),
-  xlab=paste("1st canonical axis", paste(round(cva_1$Var[1,2],1),"%")))
-
-#histogram showing same thing for CA 2; 20% of overall variation
-
-histogram(~cva_1$CVscores[,2]|factor, 
-      layout=c(1,length(levels(factor))),
-      xlab=paste("2nd canonical axis", paste(round(cva_1$Var[2,2],1),"%")))
 
 
 #plot Mahalahobis; this will show the relationships between my groups
@@ -307,6 +289,7 @@ overlap, as expected but if we color the points with respect to tooth position
 we see the progression of the reciprocal movement in the points with 
 respect tooth position.
 
+Variation among groups:
 This CVA explains 89% of the overall variation!! Hey, that's pretty awesome.
 
 *still trying to figure out the R script for this part.
@@ -325,9 +308,9 @@ cva_try <- CVA(toothset[ ,7:34], groups=factor2, weighting = TRUE, plot = TRUE,
 
 
 
-#Mahalanobis Distance Between Upper jaws species and lower jaws species
+#LDA Upper jaws by species (need to do this again for lower jaw) 
 
-It takes into consideration the variance and correlation of the variables in measuring distances between points, i. e., differences in directions in which there is less variation within groups are given greater weight than are differences in directions in which there is more variation.
+It takes into consideration the variance and correlation of the variables in measuring distances between points, i. e., differences in directions in which there is less variation within groups are given greater weight than are differences in directions in which there is more variation. Similar to PCA but does a better job of separating things.
 
 ```{r}
 
@@ -343,10 +326,22 @@ matrix_upper <- as.matrix(chordsU)
 matrix_lower <- as.matrix(chordsL)
 
 practice_lda <- lda(matrix_upper, as.factor(upperset[ ,2]))
+
+
 plot(lda(matrix_upper, as.factor(upperset[ ,2])), lower.panel= NULL)
+
+#LD1 and LD2 explain 60% of the variation. Just want to view this single plot (and possibly LD3-10%)
+
+
 
 #now I want to look at plots individually, but I don't know how?
 
+#this is basically an analysis to confirm the upper jaw teeth are better descriptors
+#of species specific tooth shape , with regards to the Maha. distances, but has a better
+#visual representation than the CVA 
+
+uppermean <- practice_lda$mean
+dist(predict(practice_lda, uppermean)$x)
 
 
 ```
@@ -377,6 +372,7 @@ xlab=paste("1st canonical axis", paste(round(cva_lamnid$Var[1,1],1),"%")),
 ylab=paste("2nd canonical axis", paste(round(cva_lamnid$Var[2,1],1),"%")))
 
 text(cva_lamnid$CVscores, as.character(lamnid_factor), col=as.numeric(lamnid_factor), cex=.7)
+
 ```
 
 #poor separation in lower jaws of Cg, Cl, ca, Cp
@@ -439,50 +435,39 @@ cva_ReqU$Dist
 ##LDA (all sharks)
 
 ```{r}
-#are some teeth better than others than distinguishing among species
 
 library(MASS)
-
-upper_coords <- upperjaw[, 7:34]
-lower_coords <- lowerjaw[, 7:34]
-
-jaw_type <-as.factor(upper[ ,4])
-
 
 #make a matrix of all coords, then separate matrix to upper and lower.
 
 allcoords = ExtantData[ , 7:34]
-matshark <- as.matrix(allcoords)
+matrixshark <- as.matrix(allcoords)
 
+#jaw type lda
 
-#overall lda
+lda <- lda(matrixshark, as.factor(ExtantData[ ,4]))
+plot(lda, col = 'blue')
 
-shark_lda <- lda(matshark, as.factor(ExtantData[ ,2]))
-plot(shark_lda, col = 'blue')
-
-#this does a pretty nice job of separating species out from one another
-#But we can't tell what is the upper and lower jaw. Continue to do an 
-#lda that distinguishes the upper and lower jaws from one another. 
-#this is the opposite result of the pca; it does a better job at 
-#distinguishing between species but not jaw type.
+#again, just shows nice separation with jaw type. Car. taurus is quite different.
 
 ```
 
-##Mahalanobis Distance Between Shark Species
+##Mahalanobis Distance ^ LDA
 
 
 ```{r}
 
 #now let's compute the distances between mean groups in space defined by the #dis.functions
-#the compute the mahalanobis distance between groups (separating our species)
+#the compute the mahalanobis distance between groups (separating our species; this output
+#give for jaw type averaged)
 
-meangroup <- shark_lda$mean
-dist(predict(shark_lda, meangroup)$x)
+ldajaw <- lda(matrixshark, as.factor(ExtantData[ ,2]))
+meangroup <- ldajaw$mean
+dist(predict(ldajaw, meangroup)$x)
 
 
-#Plotting tooth by position
-#for the x coordinate only of the 4th position tooth which 
 ```
+
 
 #Shape by tooth position (for distinct species)
 ```{r}
@@ -555,33 +540,6 @@ plot(lowerjaw$ProcCoord8~lowerjaw$tooth.position, main="tooth position/ shape Lo
 ```
 
 
-#LDA of Upper and Lower Jaws Separated. 
-
-```{r}
-upper_coords <- upperjaw[, 7:34]
-lower_coords <- lowerjaw[, 7:34]
-
-
-matshark_upper <- as.matrix(upper_coords)
-matshark_lower <- as.matrix(lower_coords)
-
- 
-#Upper
-
-upper_lda <- lda(matshark_upper, as.factor(upperjaw[ ,2]))
-plot(lda(matshark_upper, as.factor(upperjaw[ ,2])))
-
-
-#Lower
-
-lower_lda <- lda(matshark_lower, as.factor(lowerjaw[ ,2]))
-plot(lda(matshark_lower, as.factor(lowerjaw[ ,2])))
-
-```
-
-
-
-
 #Clustering our Data Set; Cluster Analysis
 
 This emphasizes both differences and similarities among individual clusters
@@ -589,6 +547,9 @@ by clustering these entities based on inter-entity resemblance. This technique
 is supporting what was previously found in the CVA. It notes that the optimal
 amount of clusters explain the most variation in the dataset,
 which is what the CVA was able to conclude. 
+
+This is not a necessary analysis, but just to strengthen previous results with
+an alternate method.
 
 ```{r}
 #find optimal number of clusters for dataset
