@@ -290,7 +290,7 @@ we see the progression of the reciprocal movement in the points with
 respect tooth position.
 
 Variation among groups:
-This CVA explains 89% of the overall variation!! Hey, that's pretty awesome.
+This CVA explains 70% of the overall variation!! Hey, that's pretty awesome.
 
 *still trying to figure out the R script for this part.
 
@@ -470,6 +470,8 @@ dist(predict(ldajaw, meangroup)$x)
 
 
 #Shape by tooth position (for distinct species)
+
+refer to morphoJ project with PCA by tooth position
 ```{r}
 #acronotus
 

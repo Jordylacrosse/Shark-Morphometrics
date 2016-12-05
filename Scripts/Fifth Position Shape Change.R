@@ -71,6 +71,9 @@ xydat_St5 <- get_xydat(St5_coords)
 
 
 
+#I'm plotting the tooth shape for each species, position 5 of the upper jaw,
+#but the scaling of the axes are distorting some tooth shape.
+
 #acronotus
 x_avg_Ca5 <- tapply(xydat_Ca5$x, xydat_Ca5$landmark, mean)
 y_avg_Ca5 <-tapply(xydat_Ca5$y, xydat_Ca5$landmark, mean)
@@ -97,12 +100,7 @@ y_avg_Cf5 <-tapply(xydat_Cf5$y, xydat_Cf5$landmark, mean)
 
 points(x_avg_Cf5, y_avg_Cf5, pch=19, col='green')
 
-#Prionace
 
-x_avg_Pg5 <- tapply(xydat_Pg5$x, xydat_Pg5$landmark, mean)
-y_avg_Pg5 <-tapply(xydat_Pg5$y, xydat_Pg5$landmark, mean)
-
-points(x_avg_Pg5, y_avg_Pg5, pch=19, col='yellow')
 
 #Isodon
 
@@ -118,7 +116,7 @@ x_avg_Cu5 <- tapply(xydat_Cu5$x, xydat_Cu5$landmark, mean)
 y_avg_Cu5 <-tapply(xydat_Cu5$y, xydat_Cu5$landmark, mean)
 
 
-points(x_avg_Cu5, y_avg_Cu5, pch=19, col='black')
+points(x_avg_Cu5, y_avg_Cu5, pch=19, col='blue')
 
 #Lewini
 
@@ -153,20 +151,6 @@ y_avg_Co5 <-tapply(xydat_Co5$y, xydat_Co5$landmark, mean)
 points(x_avg_Co5, y_avg_Co5, pch=19, col='darkslategray')
 
 
-#Oxy
-
-x_avg_Io5 <- tapply(xydat_Io5$x, xydat_Io5$landmark, mean)
-y_avg_Io5 <-tapply(xydat_Io5$y, xydat_Io5$landmark, mean)
-
-points(x_avg_Io5, y_avg_Io5, pch=19, col='darkslategray')
-
-#Paucus
-
-x_avg_Ip5 <- tapply(xydat_Ip5$x, xydat_Ip5$landmark, mean)
-y_avg_Ip5 <-tapply(xydat_Ip5$y, xydat_Ip5$landmark, mean)
-
-
-plot(x_avg_Ip5, y_avg_Ip5, pch=19, col='deeppink4')
 
 #plumbeus
 
@@ -189,11 +173,32 @@ y_avg_St5 <-tapply(xydat_St5$y, xydat_St5$landmark, mean)
 
 points(x_avg_St5, y_avg_St5, pch=19, col='dodgerblue4')
 
+-----------
+#new plot with new scaling
+  
+#Paucus
+
+x_avg_Ip5 <- tapply(xydat_Ip5$x, xydat_Ip5$landmark, mean)
+y_avg_Ip5 <-tapply(xydat_Ip5$y, xydat_Ip5$landmark, mean)
+
+
+plot(x_avg_Ip5, y_avg_Ip5, pch=19, col='deeppink4')
+
+#Oxy
+
+x_avg_Io5 <- tapply(xydat_Io5$x, xydat_Io5$landmark, mean)
+y_avg_Io5 <-tapply(xydat_Io5$y, xydat_Io5$landmark, mean)
+
+points(x_avg_Io5, y_avg_Io5, pch=19, col='darkslategray')
 
 
 
+#Prionace
 
+x_avg_Pg5 <- tapply(xydat_Pg5$x, xydat_Pg5$landmark, mean)
+y_avg_Pg5 <-tapply(xydat_Pg5$y, xydat_Pg5$landmark, mean)
 
+points(x_avg_Pg5, y_avg_Pg5, pch=19, col='yellow')
 
 
 
@@ -221,11 +226,9 @@ long<- cbind(x_avg_Cg5, y_avg_Cg5)
 obscur<- cbind(x_avg_Co5, y_avg_Co5)
 rinch<- cbind(x_avg_Io5, y_avg_Io5)
 pauc<- cbind(x_avg_Ip5, y_avg_Ip5)
-blum<- cbind(x_avg_Cp5, y_avg_Cp5)
+plum<- cbind(x_avg_Cp5, y_avg_Cp5)
 rhz<- cbind(x_avg_Rt5, y_avg_Rt5)
 tib<- cbind(x_avg_St5, y_avg_St5)
-
-
 
 
 mean_5 <- cbind(x_avg_m5, y_avg_m5) #grey
@@ -235,30 +238,39 @@ mean_5 <- cbind(x_avg_m5, y_avg_m5) #grey
 #(i.e: distance between landmark 1>2>3>4>5>6...14)
 
 dist_acro <- vegdist(acro, method="euclidean")
+dist_alti <- vegdist(alti, method="euclidean")
 dist_brevi <- vegdist(brevi, method="euclidean")
 dist_falci <- vegdist(falci, method="euclidean")
+dist_prio <- vegdist(prio, method="euclidean")
+dist_iso <- vegdist(iso, method="euclidean")
+dist_leuc <- vegdist(leuc, method="euclidean")
+dist_lew <- vegdist(lew, method="euclidean")
+dist_limb <- vegdist(limb, method="euclidean")
+dist_long <- vegdist(long, method="euclidean")
+dist_obscur <- vegdist(obscur, method="euclidean")
+dist_rinch <- vegdist(rinch, method="euclidean")
+dist_pauc <- vegdist(pauc, method="euclidean") 
+dist_plum <- vegdist(plum, method="euclidean")
+dist_rhz <- vegdist(rhz, method="euclidean")
+dist_tib <- vegdist(tib, method="euclidean")
 
 dist_mean <- vegdist(mean_5, method="euclidean")
 
 
 #compare to see how these distances differ from the mean (which landmarks attribute
-    #to the greatest change per/ species.) 
+#to the greatest change per/ species.) 
 
 
 ##Euclidean distance of species from mean (upper jaw, 5th pos.)
 
 #I want to see what landmarks are attributing to the most change in tooth shape
 #for each species ( from mean reference shape, to target shape:species)
-
-
-
-
-
 #Shape change in the 5th position, upper jaw only
-
-
-
 #difference of acronotus from mean
+
+#Using the mean is not really helpful because we have such a wide range of shapes 
+#across species
+
 apply(mean_5 - acro,1,function(x){sqrt(x[1]^2+x[2]^2)})
 
 #difference of brevipinna from mean
@@ -279,13 +291,38 @@ apply(cbind(adist,bdist,fdist),1,sd)
 #the most change in shape with regards to species in the upper jaw.
 #we can see a considerable amount of variation due to landmark 3, 10, and 13 as well.
 
-#this could also be done for the same position in the lower jaw, however, the LDA 
-#expressed significant overlap. Therefore, I am leaving this analysis to only 
-#the upper jaw since these are the best descriptors of species. 
+ 
+-----------------------------------------
+
+#find the landmark distance between very similar species (tooth shape)
+##Euclidean distance of species from closely related species deducted from
+#mahalanobis dendrogram on previous analysis (upper jaw, 5th pos. only)
+
+#first cluster of : Cu, Cg, Co (uppers only)
+obscurdist <- apply(obscur - long,1,function(x){sqrt(x[1]^2+x[2]^2)})
+longdist <- apply(long - leuc,1,function(x){sqrt(x[1]^2+x[2]^2)})
+leucdist <- apply(leuc - obscur,1,function(x){sqrt(x[1]^2+x[2]^2)})
+
+cbind(obscurdist,longdist,leucdist)
+
+
+#Rt, Ca, Cb
+
+brevidist <- apply(brevi - acro,1,function(x){sqrt(x[1]^2+x[2]^2)})
+rhizodist  <- apply(rhz - brevi,1,function(x){sqrt(x[1]^2+x[2]^2)})
+acronotusdist <- apply(acro - rhz,1,function(x){sqrt(x[1]^2+x[2]^2)})
+
+cbind(brevidist, rhizodist, acronotusdist)
 
 
 
+#difference between paucus and oxyrinchus
+
+apply(pauc - rinch,1,function(x){sqrt(x[1]^2+x[2]^2)})
 
 
+#isodon and limbatus (uppers)
 
-#find the interlandmark distance between very similar species (tooth shape)
+apply(iso - limb,1,function(x){sqrt(x[1]^2+x[2]^2)})
+
+
