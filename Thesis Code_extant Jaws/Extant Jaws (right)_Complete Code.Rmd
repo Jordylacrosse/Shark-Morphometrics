@@ -91,7 +91,7 @@ lower_coords <- lowerjaw[, 7:34]
 ```
 
 #RDA
-RDA can also be considered a constrained version of principal components analysis (PCA), wherein canonical axes - built from linear combinations of response variables - must also be linear combinations of the explanatory variables (i.e. fitted by MLR). is a method to extract and summarise the variation in a set of response variables that can be explained by a set of explanatory variables. More accurately, RDA is a direct gradient analysis technique which summarises linear relationships between components of response variables that are "redundant" with (i.e. "explained" by) a set of explanatory variables (very similar to a MANOVA)
+RDA can also be considered a constrained version of principal components analysis (PCA), wherein canonical axes - built from linear combinations of response variables - must also be linear combinations of the explanatory variables . is a method to extract and summarise the variation in a set of response variables that can be explained by a set of explanatory variables. More accurately, RDA is a direct gradient analysis technique which summarises linear relationships between components of response variables that are "redundant" with (i.e. "explained" by) a set of explanatory variables (very similar to a MANOVA)
 
 ```{r}
 #What is the effect of species, jaw type, and tooth position on overall variation?

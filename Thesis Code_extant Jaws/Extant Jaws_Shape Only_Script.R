@@ -8,7 +8,9 @@
 #for each species.)
 
 #just coordinates of upper and lower jaws for each species; take out metadata
-
+#(later on I realized this isn't super helpful because if we average shape across
+#position, that is a lot of variation we are excluding...this isn't a really justified
+#method. So instead, refer to 5th position shape change)
 
 acronotus<-   ExtantData[ExtantData$species=="Ca",]
 altimus<-     ExtantData[ExtantData$species=="ca",]
