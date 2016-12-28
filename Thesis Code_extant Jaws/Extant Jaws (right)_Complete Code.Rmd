@@ -212,8 +212,17 @@ cva_1$Dist
 # get the typicality probabiliites and classifications - tagging specimens with a low probability < 0.01
 #as an outlier (unassigned) 
 
-typprobs <- typprobClass(cva_1$CVscores,groups=factor)
-print(typprobs)
+toothset <-ExtantData[ExtantData$species %in% c("Ip", "Io", "Ca", "ca", "Cb", "Cf", "Pg,", "Ci", "Cu","Sl", "Cl", "Cg", "Co", "Cp", "Rt", "St" ), ]
+
+testcoords <- toothset[ , 7:34]
+factor7 <- as.factor(paste(toothset$species, toothset$jaw.type, sep="_"))
+
+cva_try2 <- CVA(testcoords, groups=factor7, weighting = TRUE, plot = TRUE,
+              rounds = 0, cv = FALSE, p.adjust.method = "none")
+
+
+typprobs2 <- typprobClass(cva_try2$CVscores,groups=factor7)
+print(typprobs2)
 
 #the classification accurracy of the CV is about 86%. This is extremely high
 #and shows that the separation among the teeth for each species is correct 
@@ -249,8 +258,10 @@ text(cva_1$CVscores, as.character(factor), col=as.numeric(factor), cex=.7)
 #This does a much better job than the PC in distinguishing groups of species
 #for the upper and lower jaws. It also explains 20% more variance than the first
 #two pC's do. However, it's pretty messy. I want to look at this for just upper and just for lower jaws. 
+```
 
 
+```{r}
 #plot Mahalahobis; this will show the relationships between my groups
 
 sharkdendroS=hclust(cva_1$Dist$GroupdistMaha)
@@ -431,6 +442,36 @@ cva_ReqU$Dist
 
 ```
 
+#poor separation in isodon and limbatus uppers and lower 
+
+```{r}
+
+isolimb <- upperjaw[upperjaw$species %in% c("Ci", "Cl"), ]
+iso_lower <- lowerjaw[lowerjaw$species %in% c("Ci"), ]
+
+new<- rbind(isolimb, iso_lower)
+new_coords <-new[ , 7:34]
+new_factor <- as.factor(paste(new$species, new$jaw.type, sep="_"))
+
+
+cva_limb_iso <- CVA(new_coords, groups=new_factor, weighting = TRUE, plot = TRUE,
+             rounds = 0, cv = TRUE, p.adjust.method = "none") 
+
+plot(cva_limb_iso$CVscores, col=new_factor, pch=as.numeric(new_factor), typ="n",asp=1,
+xlab=paste("1st canonical axis", paste(round(cva_limb_iso$Var[1,1],1),"%")),
+ylab=paste("2nd canonical axis", paste(round(cva_limb_iso$Var[2,1],1),"%")))
+
+text(cva_limb_iso$CVscores, as.character(new_factor), col=as.numeric(new_factor), cex=.7)
+
+
+cva_limb_iso$Dist
+
+#still pretty good separation. Oddly, the Ci_U and Ci_L share the greatest similarity
+# little change in the upper and lower jaw, and the upper jaws of Ci and Cl are just a
+#tad different than Ci. Ci uppers are almost equidistant from its own lowers and the uppers
+#of Cl. 
+
+```
 
 ##LDA (all sharks)
 
