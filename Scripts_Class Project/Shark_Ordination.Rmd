@@ -1,0 +1,165 @@
+---
+title: "Shark_Ordination"
+output: pdf_document
+---
+
+#Ordination Methods
+##PCA
+
+#can teeth be distinguished based on species?
+
+```{r}
+
+#Run PCA on all of the shark data; 3 species
+
+coords <- sharkdat[ , 6:33]
+row.names(coords) <- sharkdat$Id
+pca_shark = princomp(coords)  #pca of all coordainates
+biplot(pca_shark, cex=.5)
+pca_shark$loadings
+summary(pca_shark)
+
+#PCA 1 and 2 explain about 67% of the overall variance which also does a very
+#good job. however, PCA does not base this off of a priori groups. 
+
+
+
+plot(pca_shark)
+
+#Here we can see a significant amount of structure occuring in our raw #data. We can see that there are 2 obvious clusters within the overall
+#raw data, the upper jaw teeth of all species cluster separately from 
+#the lower jaw teeth of all the species. 
+
+#this leads us to see if there is clustering within the lower and upper
+#jaw teeth separated from one another. #there are too many data points in 
+#the full data set to see if species cluster together separately in the 
+#upper and lower jaws. 
+
+
+#look at pca of upper and lower jaw separate to see if species separate
+
+upper_coord
+row.names(upper_coord) <- upper$Id
+pca_upper <- princomp(upper_coord)
+biplot(pca_upper, cex = .5)
+
+lower_coord
+row.names(lower_coord) <- lower$Id
+pca_lower <- princomp(lower_coord)
+biplot(pca_lower, cex= .5)
+
+
+#when separating out the full pca to upper and lower pca's, we can see
+#that there is some clustering within the upper and lower jaws based on #species, specifically in the upper jaw. We can see that altimus and #falciformis are clustering together in some areas of the same tooth #position. So there is overalp going on , showing similar tooth shape #between these species , but there is also some clustering of species #occurring. Ca appears to occupy the upper poriton of the graph, while Cf #occupies the left and center protion of the graph, and Cb occupies the #lower porition of the graph (all of these for the most part). However, #there is significant overlap occuring in the centroid of the graph, so 
+#let's see if there is another analysis that will allow us to look at 
+#species separation/overlap for the upper and lower jaws. 
+
+```
+
+Here we can see the PCA has a clear distinction between the upper and lower jaws
+, I want to try and see if a CVA will be able to distinguish between species too. 
+
+
+##CVA; canonical variate analysis
+
+canonical variates analysis - A method of multivariate analysis in which the variation among groups is expressed relative to the pooled within-group covariance matrix. Canonical variates analysis finds linear transformations of the data which maximize the among group variation relative to the pooled within-group variation. The canonical variates then may be displayed as an ordination to show the group centroids and scatter within groups.The canonical variates are uncorrelated, however the vectors of coefficients are not orthogonal as in Principal Component Analysis.
+
+##Cva using Package Morpho; CVA of Upper and lower jaws as a predictor
+
+
+
+
+```{r}
+
+install.packages("Morpho")
+library(Morpho)
+
+coords <- sharkdat[ , 6:33]
+factor <- as.factor(paste(sharkdat$species, sharkdat$jaw.type, sep="_"))
+
+#RUN the CVA
+
+cva_1 <- CVA(coords, groups=factor, weighting = TRUE, plot = TRUE,
+             rounds = 0, cv = FALSE, p.adjust.method = "none")
+
+cva_1$Var
+cva_2$Dist
+
+# get the typicality probabiliites and classifications - tagging specimens with a low probability < 0.01
+#as an outlie (unassigned) 
+
+typprobs <- typprobClass(cva_1$CVscores,groups=factor)
+print(typprobs)
+
+#this shows that the model correctly classifies teeth 85% of the time. This
+#is very good
+
+```
+
+#Plotting the CV
+
+```{r}
+
+
+#visualize CV scores by their groups 
+
+plot(cva_1$CVscores, col=factor, pch=as.numeric(factor), typ="n",asp=1,
+xlab=paste("1st canonical axis", paste(round(cva_1$Var[1,1],1),"%")),
+ylab=paste("2nd canonical axis", paste(round(cva_1$Var[2,1],1),"%")))
+
+text(cva_1$CVscores, as.character(factor), col=as.numeric(factor), cex=.7)
+
+#add elipses
+     for(ii in 1:length(levels(factor))){
+        dataEllipse(cva_1$CVscores[factor==levels(factor)[ii],1],
+          cva_1$CVscores[factor==levels(factor)[ii],2], 
+          add=TRUE,levels=.80, col=c(1:7)[ii])
+  }
+
+#This does a much better job than the PC in distinguishing groups of species
+#for the upper and lower jaws. It also explains 20% more variance than the first
+#two pC's do. 
+
+
+library(lattice)
+
+#histogram showing the distribution of CA's among the species
+#and jaw types. explains 66% of overall variaion for CV1
+
+histogram(~cva_1$CVscores[,1]|factor,
+  layout=c(1,length(levels(factor))),
+  xlab=paste("1st canonical axis", paste(round(cva_1$Var[1,2],1),"%")))
+
+#histogram showing same thing for CV 2; 20% of overall variation
+
+histogram(~cva_1$CVscores[,2]|factor, 
+      layout=c(1,length(levels(factor))),
+      xlab=paste("2nd canonical axis", paste(round(cva_1$Var[2,2],1),"%")))
+
+
+#plot Mahalanobis; this will show the relationships between groups
+
+dendroS=hclust(cva_1$Dist$GroupdistMaha)
+dendroS$labels=levels(factor)
+par(mar=c(4,4.5,1,1))
+dendroS=as.dendrogram(dendroS)
+plot(dendroS, main='',sub='', xlab="Shark Species and Jaw",
+     ylab='Mahalahobis distance')
+
+#does a nice job of distinguishing upper and lower jaws separate from one 
+#another based on the distances. The upper jaw teeth have a greater
+#distance than the lower jaw teeth, showing that they are better at distinguishing
+#between species. 
+
+# Variance explained by the canonical roots:
+
+cva_1$Var
+# or plot it:
+barplot(cva_1$Var[,2])
+
+#CV's do a very good job of explaining overall variation in the dataset.
+#much better than the PCA. This ordination method does a much better job
+#at looking at the within group variance, in this case species, and does
+# a better job at explaining the variation compared to the PCA. 
+
+```

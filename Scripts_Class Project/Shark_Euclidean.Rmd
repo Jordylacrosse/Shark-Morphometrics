@@ -1,0 +1,138 @@
+---
+title: "Shark_Euclidean"
+output: pdf_document
+---
+
+##Extract Tooth Position 5 for the Upper Jaw for 3 species
+#what landmarks attribute to the most variation in shape among species (euclidean distance)
+
+```{r}
+
+upper<-sharkdat[sharkdat$jaw.type=="U",]
+fifth <- upper[upper$tooth.position=="5",]
+
+#extract just the 5th tooth for each species 
+a5<-fifth[fifth$species=="Ca",]
+b5<-fifth[fifth$species=="Cb",]
+f5<-fifth[fifth$species=="Cf",]
+
+
+#just coordinates
+a5_coords <- a5[ ,6:33]
+b5_coords <- b5[ ,6:33]
+f5_coords <- f5[ ,6:33]
+
+#mean of all 5th position
+m5_coords <- fifth[ ,6:33]
+
+#xy data matrix
+xydat_a5 <- get_xydat(a5_coords)
+xydat_b5 <- get_xydat(b5_coords)
+xydat_f5 <- get_xydat(f5_coords)
+
+xydat_m5 <- get_xydat(m5_coords)
+
+#altimus
+x_avg_a5 <- tapply(xydat_a5$x, xydat_a5$landmark, mean)
+y_avg_a5 <-tapply(xydat_a5$y, xydat_a5$landmark, mean)
+
+#brevipinna
+x_avg_b5 <- tapply(xydat_b5$x, xydat_b5$landmark, mean)
+y_avg_b5 <-tapply(xydat_b5$y, xydat_b5$landmark, mean)
+
+#falciformis
+x_avg_f5 <- tapply(xydat_f5$x, xydat_f5$landmark, mean)
+y_avg_f5 <-tapply(xydat_f5$y, xydat_f5$landmark, mean)
+
+
+#mean
+x_avg_m5 <- tapply(xydat_m5$x, xydat_m5$landmark, mean)
+y_avg_m5 <- tapply(xydat_m5$y, xydat_m5$landmark, mean)
+```
+
+
+#Plot the 5th position for each species
+
+```{r}
+
+#altimus
+plot(x_avg_a5, y_avg_a5, pch=19, col='red') #mean plotted in red
+
+#brevi
+points(x_avg_b5, y_avg_b5, pch=19, col='blue')
+
+#falci
+points(x_avg_f5, y_avg_f5, pch=19, col='green')
+
+#mean shape of all 
+points(x_avg_m5, y_avg_m5, pch=19, col='grey')
+
+```
+
+Here we can see shape changes associated with a single tooth position (5)of the 
+upper jaw across 3 species and their deviation away from the mean shape. THe 
+mean was calculated as the average of all the 5th position teeth from the 
+3 species put together. 
+
+##Calculate the distance between those landmarks
+
+The distance between two landmarks is the square root of the sum of the 
+squared differences between each landmark. (Euclidean distance)
+This allows us to calculate a single value distance from one landmark to the 
+next in each species, so then we can use these to compare to the next species.
+We are going to calculate the Euclidean distance because it is a coordinate free approach for comparing biological shapes using landmark data.
+
+```{r}
+
+#matrix of each species, upper jaw
+
+alti <- cbind(x_avg_a5, y_avg_a5) #red
+brevi <- cbind(x_avg_b5, y_avg_b5) #blue
+falci <- cbind(x_avg_f5, y_avg_f5) #grenen
+mean_5 <- cbind(x_avg_m5, y_avg_m5) #grey
+
+#calculate the interlandmark distance between each landmark, for each species
+#and for the mean
+#(i.e: distance between landmark 1>2>3>4>5>6...14)
+
+dist_alti <- vegdist(alti, method="euclidean")
+dist_alti <- vegdist(brevi, method="euclidean")
+dist_alti <- vegdist(falci, method="euclidean")
+
+dist_mean <- vegdist(mean_5, method="euclidean")
+
+```
+
+compare to see how these distances differ from the mean (which landmarks attribute
+to the greatest change per/ species.) 
+
+##Euclidean distance of species from mean (upper jaw, 5th pos.)
+
+I want to see what landmarks are attributing to the most change in tooth shape
+for each species ( from mean reference shape, to target shape:species)
+
+```{r}
+
+#difference of altimus from mean
+apply(mean_5 - alti,1,function(x){sqrt(x[1]^2+x[2]^2)})
+
+#difference of brevipinna from mean
+apply(mean_5 - brevi,1,function(x){sqrt(x[1]^2+x[2]^2)})
+
+#difference of falciformis from mean
+apply(mean_5 - falci,1,function(x){sqrt(x[1]^2+x[2]^2)})
+
+
+adist = apply(mean_5 - alti,1,function(x){sqrt(x[1]^2+x[2]^2)})
+bdist = apply(mean_5 - alti,1,function(x){sqrt(x[1]^2+x[2]^2)})
+bdist = apply(mean_5 - brevi,1,function(x){sqrt(x[1]^2+x[2]^2)})
+fdist = apply(mean_5 - falci,1,function(x){sqrt(x[1]^2+x[2]^2)})
+cbind(adist,bdist,fdist)
+
+apply(cbind(adist,bdist,fdist),1,sd)
+
+#so we can see that the 4th landmark (the tip of the blade) contributes to
+#the most change in shape with regards to species in the upper jaw.
+#we can see a considerable amount of variation due to landmark 3, 10, and 13 as well. 
+
+```

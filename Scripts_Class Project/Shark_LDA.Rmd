@@ -1,0 +1,180 @@
+---
+title: "Shark_LDA"
+output: pdf_document
+---
+
+##LDA of entire (all) matrix by species
+#are some teeth better than others than distinguishing among species?
+
+```{r}
+
+library(MASS)
+
+
+upper_coord<- upper[, 6:33]
+lower_coord <- lower[, 6:33]
+
+jaw_type <-as.factor(upper[ ,4])
+
+
+#make a matrix of all coords, then separate matrix to upper and lower.
+
+matshark <- as.matrix(coords)
+
+
+#overall lda
+
+shark_lda <- lda(matshark, as.factor(sharkdat[ ,2]))
+plot(shark_lda, col = 'blue')
+
+#this doesn't do a good job of separating species out from one another
+#We can't tell what is the upper and lower jaw and where species are
+#distinct from one another. Continue to do an 
+#lda that distinguishes the upper and lower jaws from one another. 
+
+
+```
+
+
+#LDA of Species, Upper and Lower Jaws Separated. 
+
+```{r}
+
+upper_coord<- upper[, 6:33]
+lower_coord <- lower[, 6:33]
+
+matshark_upper <- as.matrix(upper_coord)
+matshark_lower <- as.matrix(lower_coord)
+
+ 
+#Upper
+
+upper_lda <- lda(matshark_upper, as.factor(upper[ ,2]))
+plot(lda(matshark_upper, as.factor(upper[ ,2])))
+
+#Here are the upper jaws, and the discriminant function is able to cluster #species
+#distinct from one another from the upper jaw teeth. Upper jaw teeth shape #are a clasifier
+#for identification to species
+#we can see that the lda detected collinear variables, which is probably why it 
+#couldn't distinguish between jaws and species earlier. 
+
+
+#Lower
+
+lower_lda <- lda(matshark_lower, as.factor(lower[ ,2]))
+plot(lda(matshark_lower, as.factor(lower[ ,2])))
+
+#Here we can see that the altimus species have  different lower #teeth from B and F. 
+#but the lower teeth of falciformis and brevipinna have significant overlap, 
+#due to the fact they exhibit similar shape. So lower jaw teeth are not as #good
+#for identifying down to the species level based on tooth shape because #they
+#have more similar shape. less variation of lower jaw teeth between species 
+
+```
+
+#Mahalanobis Distance Between Upper jaws species and lower jaws species
+
+It takes into consideration the variance and correlation of the variables in measuring distances between points, i. e., differences in directions in which there is less variation within groups are given greater weight than are differences in directions in which there is more variation.
+
+```{r}
+
+uppermean <- upper_lda$mean
+dist(predict(upper_lda, uppermean)$x)
+
+#the mahaalanobis distance from each of the species shows they are 
+#easily distinguished from one another (the larger the number, the greater 
+#the greater the difference between the grous)
+
+
+lowermean <- lower_lda$mean
+dist(predict(lower_lda, lowermean )$x)
+
+#here there is significant difference between Ca and Cb as expressed by the
+#mahalanobis distance, along with Ca and Cf, however Cb and Cf are quite similar
+#due to the small distance measurement. THis shows that there is significant overlap
+#and similarities between the shape of lower jaw teeth of falciformis and #brevipinna. So there are not as good at predicting species by the shape of the
+#lower jaw teeth. 
+
+```
+
+##Mahalanobis Distance Between Shark Species
+
+
+```{r}
+
+#now let's compute the distances between mean groups in space defined by the #dis.functions
+#the compute the mahalanobis distance between groups (separating our species)
+
+meangroup <- shark_lda$mean
+dist(predict(shark_lda, meangroup)$x)
+
+#if we compute the same for the overall LDA of the data set, we can see the same
+#overlap occuring between Cf and Cb, and we can still see the clustering of Ca #separate from the other 2 species. The differences are skewed in here because
+#this is combining both the shape data for the upper and lower jaws. The previous
+#calculation (distance) separting out the jaw type is a better depiction 
+#of analyzing the shape data. 
+
+```
+
+
+#Clustering our Data Set; Cluster Analysis
+
+This emphasizes both differences and similarities among individual clusters
+by clustering these entities based on inter-entity resemblance. This 
+is another technique reinforcing what was previoulsy found by the CVA. 
+
+#find optimal number of clusters for dataset
+
+```{r}
+
+#this function will output a log function graph showing the optimal amount
+#of clusters that describe the most variation found in the dataset. 
+
+p<-as.matrix(coords)
+
+totv <- sum(diag(var(p[, 1:28])))*388
+SSratio <- numeric(10)
+ for (i in 2:10)
+ {mod <- kmeans(p[, 1:28],i)
+   SSratio[i]<-(totv-sum(mod$withinss))/totv}
+   
+
+plot(1:10, SSratio, xlab="number of clusters", ylab="% of explained variance")
+points(1:10, c(0, SSratio[2:10]), pch=3)
+
+#we can see here that the amount of clusters that will explain the most 
+#amount of variance is about 6 (where it reaches the threshhold.). This 
+#is consistent with the CVA which also found 6 clusters that explained 85% of the
+#variation in the dataset. 
+```
+
+#apply cluster function to dataset
+
+will emphasize both differences and similarities among the samples by clustering
+entities based on inter-group resemblance. Plot 6 clusters into the function.
+
+```{r}
+library(cluster)
+library("clusterGeneration", lib.loc="~/R/win-library/3.1")
+pam(p[,1:28], 6)$clustering
+
+plot(pam(x=p[,1:28], k=6), main= "", col.p="black")
+
+#While messy, we can see how there are 6 clusters that explain most of the 
+#variance in the data set (refer to PCA loadings). These clusters show 
+#those formed from the upper and lower jaws of each species. (3 species)
+#Notice significant overlap which is most likely due to species similarity,
+#but we can see some good separation most likely due to jaw type (which 
+#does explain the most variation as seen in our RDA). 
+```
+
+
+Since the upper jaw teeth are the most identifiable to species (more variable),
+let's 
+analyze where shape change is occuring in a single tooth relative to species.
+In a previous  study, Naylor noted that the 5th position tooth in the upper 
+jaw is better to distinguish among species. By looking at just one tooth in the 
+upper jaw
+, we are now limiting shape change now to due to species. I want to see if 
+if there is visual shape change across these 3 species, and what landmarks
+are associated with shape change shown by a large standard deviation. 

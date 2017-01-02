@@ -1,0 +1,8 @@
+---
+title: "Fossil Teeth"
+output: pdf_document
+---
+
+For all fossil teeth; 232 observations (teeth collected). Teeth are only
+distinguished by ID number *no morphologic sorting involved
+
