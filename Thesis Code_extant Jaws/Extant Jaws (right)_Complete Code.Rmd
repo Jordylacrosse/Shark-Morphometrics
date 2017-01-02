@@ -4,7 +4,7 @@ output: pdf_document
 ---
 
 Read in the Procrustes Coordinates from ALL extant shark species right side 
-of jaw
+of jaw. Data set for this is labeled, extant jaw sets R data.txt
 
 #Read in Data
 ```{r}
@@ -486,7 +486,7 @@ matrixshark <- as.matrix(allcoords)
 
 #jaw type lda
 
-lda <- lda(matrixshark, as.factor(ExtantData[ ,4]))
+lda <- lda(rmatrixshark, as.factor(ExtantData[ ,4]))
 plot(lda, col = 'blue')
 
 #again, just shows nice separation with jaw type. Car. taurus is quite different.
@@ -506,7 +506,7 @@ ldajaw <- lda(matrixshark, as.factor(ExtantData[ ,2]))
 meangroup <- ldajaw$mean
 dist(predict(ldajaw, meangroup)$x)
 
-
+#LD1 and LD2: 58 and 12% explained
 ```
 
 

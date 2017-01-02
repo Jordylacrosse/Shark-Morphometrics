@@ -6,3 +6,74 @@ output: pdf_document
 For all fossil teeth; 232 observations (teeth collected). Teeth are only
 distinguished by ID number *no morphologic sorting involved
 
+
+```{r}
+
+Fossildata <- read.delim("~/Shark-Morphometrics/Shark Data/Fossilsteeth.txt")
+
+
+#using loop code, get coordinate data for fossil teeth
+
+fossilcords <- Fossildata[ , 3:30]
+
+```
+
+#PCA
+```{r} 
+#since we do not have any known data about the fossil teeth (jaw type, position, etc.)
+#the only ordination approach which we can test is the PCA, since it is unconstrained.
+
+#we would really like to look for trends with regards to jaw type and possibly 
+#tooth position, based on the trends we previously observed across ALL taxa in the modern sharks
+
+
+fossilcords <- Fossildata[ , 3:30]
+row.names(fossilcords)
+pca_fossil = princomp(fossilcords)  #pca of all coordainates
+biplot(pca_fossil, cex=.5)
+
+pca_shark$loadings
+summary(pca_shark)
+
+```
+
+Just by looking at the PCA distribution of points, it looks like we have 4 
+distinct clusters. Clear separation (possible jaw type) and then small groups within 
+the larger one, side of jaw?
+
+#Pam algorithm and Kmeans
+```{r}
+
+fossilcords
+fossilmatrix <- as.matrix(fossilcords)
+
+#Pam method (more robust than kmeans)
+
+library("cluster", lib.loc="~/R/x86_64-pc-linux-gnu-library/3.2")
+pam(Fossildata[,3:30],4, cluster.only=TRUE)
+plot(pam(x=Fossildata[ ,3:30], k=4), main="", col.p="black")
+
+#would be cool to look at this partitional clustering plot with the points their individual # to have an 
+#idea of where they may cluster too (to go back and observe.)
+
+#elbow method for kmeans
+
+totvariance <- sum(diag(var(fossilmatrix[, 1:28])))*232
+SSratio2 <- numeric(10)
+ for (i in 1:10)
+ {mod <- kmeans(fossilmatrix[, 1:28],i)
+   SSratio2[i]<-(totvariance-sum(mod$withinss))/totvariance}
+   
+
+plot(1:10, SSratio2, xlab="number of clusters", ylab="% of explained variance")
+points(1:10, c(0, SSratio2[2:10]), pch=3)
+
+#4 or 5 clusters looks like it appears to describe the most variation
+#4 is consistent with the PAM algorithm
+
+```
+
+page 123 in R book. or?pam
+
+The basic pam algorithm is fully described in chapter 2 of Kaufman and Rousseeuw(1990). Compared to the k-means approach in kmeans, the function pam has the following features: (a) it also accepts a dissimilarity matrix; (b) it is more robust because it minimizes a sum of dissimilarities instead of a sum of squared euclidean distances; (c) it provides a novel graphical display, the silhouette plot (see plot.partition) (d) it allows to select the number of clusters using mean(silhouette(pr)[, "sil_width"]) on the result pr <- pam(..), or directly its component pr$silinfo$avg.width, see also pam.object.
+
