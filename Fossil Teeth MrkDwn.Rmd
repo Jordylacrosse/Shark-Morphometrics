@@ -35,6 +35,9 @@ biplot(pca_fossil, cex=.5)
 pca_shark$loadings
 summary(pca_shark)
 
+
+#what is interesting is that the direction of procrustes coordinates go in the same direction
+#lower jaw is the top cluster, upper jaw is the bottom cluster
 ```
 
 Just by looking at the PCA distribution of points, it looks like we have 4 
@@ -56,7 +59,14 @@ plot(pam(x=Fossildata[ ,3:30], k=4), main="", col.p="black")
 #would be cool to look at this partitional clustering plot with the points their individual # to have an 
 #idea of where they may cluster too (to go back and observe.)
 
+```
+The basic pam algorithm is fully described in chapter 2 of Kaufman and Rousseeuw(1990). Compared to the k-means approach in kmeans, the function pam has the following features: (a) it also accepts a dissimilarity matrix; (b) it is more robust because it minimizes a sum of dissimilarities instead of a sum of squared euclidean distances; (c) it provides a novel graphical display, the silhouette plot (see plot.partition) (d) it allows to select the number of clusters using mean(silhouette(pr)[, "sil_width"]) on the result pr <- pam(..), or directly its component pr$silinfo$avg.width, see also pam.object.( page 123 R book)
+
+
+
+
 #elbow method for kmeans
+```{r}
 
 totvariance <- sum(diag(var(fossilmatrix[, 1:28])))*232
 SSratio2 <- numeric(10)
@@ -73,7 +83,7 @@ points(1:10, c(0, SSratio2[2:10]), pch=3)
 
 ```
 
-page 123 in R book. or?pam
+This is confirming how many clusters it is best to use
 
-The basic pam algorithm is fully described in chapter 2 of Kaufman and Rousseeuw(1990). Compared to the k-means approach in kmeans, the function pam has the following features: (a) it also accepts a dissimilarity matrix; (b) it is more robust because it minimizes a sum of dissimilarities instead of a sum of squared euclidean distances; (c) it provides a novel graphical display, the silhouette plot (see plot.partition) (d) it allows to select the number of clusters using mean(silhouette(pr)[, "sil_width"]) on the result pr <- pam(..), or directly its component pr$silinfo$avg.width, see also pam.object.
+
 
