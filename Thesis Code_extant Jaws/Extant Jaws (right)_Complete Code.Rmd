@@ -147,6 +147,8 @@ summary(pca_shark)
 #PCA 1 and 2 explain about 70% of the overall variance which also does a very
 #good job. however, PCA does not base this off of a priori groups. I wanted
 #to be able to see if species could be differentiated from one another. 
+# the top cluster by ProcCoord7 are teeth from the lower jaw, those on the lower
+#cluster are upper jaw teeth
 
 
 

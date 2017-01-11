@@ -11,15 +11,11 @@ distinguished by ID number *no morphologic sorting involved
 
 Fossildata <- read.delim("~/Shark-Morphometrics/Shark Data/Fossilsteeth.txt")
 
-
-#using loop code, get coordinate data for fossil teeth
-
-fossilcords <- Fossildata[ , 3:30]
-
 ```
 
 #PCA
 ```{r} 
+
 #since we do not have any known data about the fossil teeth (jaw type, position, etc.)
 #the only ordination approach which we can test is the PCA, since it is unconstrained.
 
