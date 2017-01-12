@@ -27,6 +27,7 @@ fossilcords <- Fossildata[ , 3:30]
 row.names(fossilcords)
 pca_fossil = princomp(fossilcords)  #pca of all coordainates
 biplot(pca_fossil, cex=.5)
+text(pca_fossil$scores, as.character(Fossildata$individual), cex=.7)
 
 pca_shark$loadings
 summary(pca_shark)
@@ -59,8 +60,6 @@ plot(pam(x=Fossildata[ ,3:30], k=4), main="", col.p="black")
 The basic pam algorithm is fully described in chapter 2 of Kaufman and Rousseeuw(1990). Compared to the k-means approach in kmeans, the function pam has the following features: (a) it also accepts a dissimilarity matrix; (b) it is more robust because it minimizes a sum of dissimilarities instead of a sum of squared euclidean distances; (c) it provides a novel graphical display, the silhouette plot (see plot.partition) (d) it allows to select the number of clusters using mean(silhouette(pr)[, "sil_width"]) on the result pr <- pam(..), or directly its component pr$silinfo$avg.width, see also pam.object.( page 123 R book)
 
 
-
-
 #elbow method for kmeans
 ```{r}
 
@@ -79,7 +78,42 @@ points(1:10, c(0, SSratio2[2:10]), pch=3)
 
 ```
 
-This is confirming how many clusters it is best to use
+This is confirming how many clusters it is best to use (which is 4)
+
+
+
+#k validation or some sort of mahalanobis distance?
+
+the squared Mahalanobis distance is the same as of the sum of the squares
+of all non-zero standardised principal components
+
+to calculate the mahalanobis distance using the Principal components
+
+
+BASICALLY, I want to see where the shape of the fossil teeth lie in relation 
+to the shape of the known teeth using the maha. distance.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

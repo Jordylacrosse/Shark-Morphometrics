@@ -169,21 +169,7 @@ plot(pca_shark)
 
 #PCA by tooth position
 doesn't give me the output I'm looking for. (did this with CVA in MorphoJ)
-```{r}
 
-acronotus <- ExtantData[ExtantData$species=="Ca",]
-upper_acronotus <- acronotus[acronotus$jaw.type=="U",]
-lower_acronotus <- acronotus[acronotus$jaw.type=="L",]
-
-upper_acronotus_coord <- upper_acronotus[ ,7:34 ]
-lower_acronotus_coord <- lower_acronotus[ ,7:34 ]
-
-acronotus$tooth.position
-
-testpca$loadings
-
-
-```
 
 
 #CVA
@@ -224,14 +210,11 @@ cva_try2 <- CVA(testcoords, groups=factor7, weighting = TRUE, plot = TRUE,
 
 
 typprobs2 <- typprobClass(cva_try2$CVscores,groups=factor7)
-print(typprobs2)
+Butprint(typprobs2)
 
 #the classification accurracy of the CV is about 86%. This is extremely high
 #and shows that the separation among the teeth for each species is correct 
 #86% of the time. 
-
-#I need to see Dan about debugging the 0's in this to get a better estimate of the
-#classification accuracy
 
 ```
 
@@ -262,7 +245,7 @@ text(cva_1$CVscores, as.character(factor), col=as.numeric(factor), cex=.7)
 #two pC's do. However, it's pretty messy. I want to look at this for just upper and just for lower jaws. 
 ```
 
-
+#Dendrogram of Maha Distances
 ```{r}
 #plot Mahalahobis; this will show the relationships between my groups
 
@@ -288,37 +271,6 @@ barplot(cva_1$Var[,2])
 #much better than the PCA. 65% of cumulative % explained. not bad
 
 ```
-
-#CVA by tooth position
-
-To look at changes with respect to tooth
-position
-
-I did this in morphoJ with species, jaw type, and tooth position as classifiers.
-The strongest one with the most signal is with species, jaw type, and tooth position
-if we color the data points just with respect to jaw type, we can see clear separation
-then if we color the data points with respect to species, we can see a lot of 
-overlap, as expected but if we color the points with respect to tooth position
-we see the progression of the reciprocal movement in the points with 
-respect tooth position.
-
-Variation among groups:
-This CVA explains 70% of the overall variation!! Hey, that's pretty awesome.
-
-*still trying to figure out the R script for this part.
-
-```{r}
-toothset <-ExtantData[ExtantData$species %in% c("Ip", "Io", "Ca", "ca", "Cb", "Cf", "Pg,", "Ci", "Cu","Sl", "Cl", "Cg", "Co", "Cp", "Rt", "St" ), ]
-
-toothchords <- toothset[ ,7:34]
-factor2 <- as.factor(paste(toothset$tooth.position, toothset$jaw.type, sep="_"))
-
-cva_try <- CVA(toothset[ ,7:34], groups=factor2, weighting = TRUE, plot = TRUE,
-              rounds = 0, cv = FALSE, p.adjust.method = "none")
-
-
-```
-
 
 
 #LDA Upper jaws by species (need to do this again for lower jaw) 
@@ -358,7 +310,6 @@ dist(predict(practice_lda, uppermean)$x)
 
 
 ```
-
 
 
 Look at bivariate plots of the species that had little

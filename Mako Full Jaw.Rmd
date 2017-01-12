@@ -24,8 +24,7 @@ pca_mako$loadings
 
 factormako <- as.factor(paste(MakoDat$jaw.type, MakoDat$Side, sep="_"))
 
-
-#RUN the CVA
+#factor by jaw and side
 
 cva_mako <- CVA(makocoords, groups=factormako, weighting = TRUE, plot = TRUE,
              rounds = 0, cv = FALSE, p.adjust.method = "none")
@@ -51,6 +50,20 @@ xlab=paste("1st canonical axis", paste(round(cva_mako$Var[1,1],1),"%")),
 ylab=paste("2nd canonical axis", paste(round(cva_mako$Var[2,1],1),"%")))
 
 text(cva_mako$CVscores, as.character(factormako), col=as.numeric(factormako), cex=.7)
+
+#so the opposite jaw and opposite side are more similar
+
+```
+
+
+
+
+
+
+
+
+
+
 
 
 
