@@ -160,16 +160,14 @@ plot(pca_shark)
 #from the morphoJ package. 
 
 #this leads us to see if there is clustering within the lower and upper
-#jaw teeth separated from one another. #there are too many data points in 
-#the full data set to see if species cluster together separately in the 
-#upper and lower jaws. 
+#jaw teeth separated from one another.Which ends up being tooth position
 
 ```
 
 
 #PCA by tooth position
-doesn't give me the output I'm looking for. (did this with CVA in MorphoJ)
-
+(did this  in MorphoJ by looking at the color by points by tooth position 
+PCA)
 
 
 #CVA
@@ -211,6 +209,8 @@ cva_try2 <- CVA(testcoords, groups=factor7, weighting = TRUE, plot = TRUE,
 
 typprobs2 <- typprobClass(cva_try2$CVscores,groups=factor7)
 Butprint(typprobs2)
+
+cva_1
 
 #the classification accurracy of the CV is about 86%. This is extremely high
 #and shows that the separation among the teeth for each species is correct 
@@ -268,7 +268,7 @@ cva_1$Var
 barplot(cva_1$Var[,2])
 
 #CV's do a very good job of explaining overall variation in the dataset.
-#much better than the PCA. 65% of cumulative % explained. not bad
+#much better than the PCA. 66% of cumulative % explained. not bad
 
 ```
 
@@ -294,7 +294,6 @@ practice_lda <- lda(matrix_upper, as.factor(upperset[ ,2]))
 
 
 plot(lda(matrix_upper, as.factor(upperset[ ,2])), lower.panel= NULL)
-
 #LD1 and LD2 explain 60% of the variation. Just want to view this single plot (and possibly LD3-10%)
 
 
@@ -337,6 +336,9 @@ ylab=paste("2nd canonical axis", paste(round(cva_lamnid$Var[2,1],1),"%")))
 
 text(cva_lamnid$CVscores, as.character(lamnid_factor), col=as.numeric(lamnid_factor), cex=.7)
 
+cva_lamnid
+cva_lamnid$Dist
+cva_lamnid$Var
 ```
 
 #poor separation in lower jaws of Cg, Cl, ca, Cp
@@ -361,9 +363,81 @@ ylab=paste("2nd canonical axis", paste(round(cva_Requ$Var[2,1],1),"%")))
 text(cva_Requ$CVscores, as.character(Requ_factor), col=as.numeric(Requ_factor), cex=.7)
 
 cva_Requ$Dist
-
+cva_Requ$Var
 #interestingly enough, even though this group of tooth shape shows the smallest separation,
 #they are still distinct from one another, with the exception of "ca"
+
+
+
+
+
+#closer look at altimus and plumbeus and longimanus (really just concerned with the Dist matrix)
+
+altiplumb<-upperjaw[upperjaw$species %in% c("ca", "Cp", "Cg" ),]
+altiplumb_coords<- altiplumb[ ,7:34]
+
+alt_factor <- as.factor(paste(altiplumb$species, sep="_"))
+
+cva_altiplumb <- CVA(altiplumb_coords, groups=alt_factor, weighting = TRUE, plot = TRUE,
+             rounds = 0, cv = TRUE, p.adjust.method = "none")
+
+plot(cva_altiplumb$CVscores, col=alt_factor, pch=as.numeric(alt_factor), typ="n",asp=1,
+xlab=paste("1st canonical axis", paste(round(cva_altiplumb$Var[1,1],1),"%")),
+ylab=paste("2nd canonical axis", paste(round(cva_altiplumb$Var[2,1],1),"%")))
+
+text(cva_altiplumb$CVscores, as.character(alt_factor), col=as.numeric(alt_factor), cex=.7)
+
+cva_altiplumb$Dist
+
+
+```
+
+2 subdivisions in upper jaw teeth
+```{r}
+
+upperjaw<-ExtantData[ExtantData$jaw.type=="U",]
+
+sub1<- upperjaw[upperjaw$species %in% c("St", "Sl", "Cb","Ca","Rt"), ]
+sub1_coords<- sub1[ , 7:34]
+
+sub1_factor <- as.factor(paste(sub1$species, sep="_"))
+cva_sub1 <- CVA(sub1_coords, groups=sub1_factor, weighting = TRUE, plot = TRUE,
+             rounds = 0, cv = TRUE, p.adjust.method = "none")
+
+plot(cva_sub1$CVscores, col=sub1_factor, pch=as.numeric(sub1_factor), typ="n",asp=1,
+xlab=paste("1st canonical axis", paste(round(cva_sub1$Var[1,1],1),"%")),
+ylab=paste("2nd canonical axis", paste(round(cva_sub1$Var[2,1],1),"%")))
+
+text(cva_sub1$CVscores, as.character(sub1_factor), col=as.numeric(sub1_factor), cex=.7)
+
+cva_sub1$Dist
+cva_sub1$Var
+
+
+
+#subdivision 2
+
+upperjaw<-ExtantData[ExtantData$jaw.type=="U",]
+
+sub2<- upperjaw[upperjaw$species %in% c("Co", "Cg", "Cu","Cf","Cp","ca","Pg"), ]
+sub2_coords<- sub2[ , 7:34]
+
+sub2_factor <- as.factor(paste(sub2$species, sep="_"))
+cva_sub2 <- CVA(sub2_coords, groups=sub2_factor, weighting = TRUE, plot = TRUE,
+             rounds = 0, cv = TRUE, p.adjust.method = "none")
+
+plot(cva_sub2$CVscores, col=sub2_factor, pch=as.numeric(sub2_factor), typ="n",asp=1,
+xlab=paste("1st canonical axis", paste(round(cva_sub2$Var[1,1],1),"%")),
+ylab=paste("2nd canonical axis", paste(round(cva_sub2$Var[2,1],1),"%")))
+
+text(cva_sub2$CVscores, as.character(sub2_factor), col=as.numeric(sub2_factor), cex=.7)
+
+cva_sub2$Dist
+cva_sub2$Var
+
+
+
+
 
 ```
 
@@ -389,16 +463,16 @@ ylab=paste("2nd canonical axis", paste(round(cva_ReqU$Var[2,1],1),"%")))
 text(cva_ReqU$CVscores, as.character(ReqU_factor), col=as.numeric(ReqU_factor), cex=.7)
 
 cva_ReqU$Dist
-
+cva_ReqU$Var
 
 #again, pretty decent separation with little overlap. 
 
 ```
 
+
 #poor separation in isodon and limbatus uppers and lower 
 
 ```{r}
-
 isolimb <- upperjaw[upperjaw$species %in% c("Ci", "Cl"), ]
 iso_lower <- lowerjaw[lowerjaw$species %in% c("Ci"), ]
 
@@ -418,7 +492,7 @@ text(cva_limb_iso$CVscores, as.character(new_factor), col=as.numeric(new_factor)
 
 
 cva_limb_iso$Dist
-
+cva_limb_iso$Var
 #still pretty good separation. Oddly, the Ci_U and Ci_L share the greatest similarity
 # little change in the upper and lower jaw, and the upper jaws of Ci and Cl are just a
 #tad different than Ci. Ci uppers are almost equidistant from its own lowers and the uppers

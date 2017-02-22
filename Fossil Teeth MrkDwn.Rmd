@@ -22,15 +22,46 @@ Fossildata <- read.delim("~/Shark-Morphometrics/Shark Data/Fossilsteeth.txt")
 #we would really like to look for trends with regards to jaw type and possibly 
 #tooth position, based on the trends we previously observed across ALL taxa in the modern sharks
 
-
+par(mfrow=c(1,2))
 fossilcords <- Fossildata[ , 3:30]
 row.names(fossilcords)
 pca_fossil = princomp(fossilcords)  #pca of all coordainates
 biplot(pca_fossil, cex=.5)
+
 text(pca_fossil$scores, as.character(Fossildata$individual), cex=.7)
 
 pca_shark$loadings
 summary(pca_shark)
+
+# overlap fossil teeth on extant PCA
+allcoords = ExtantData[ , 7:34]
+row.names(allcoords)
+pca_shark = princomp(allcoords)  #pca of all coordainates
+biplot(pca_shark, cex=.5, choices = c(1, 2))
+pca_shark$loadings
+summary(pca_shark)
+
+fos_pre = predict(pca_shark, newdata=fossilcords)
+points(fos_pre[ , 1], fos_pre[ , 2], col='blue', pch=19)
+
+
+#this is showing that when the fossil teeth are plotted within the PCA of the extant, it encompases the variation but the 
+#principle componenets one and 2 do not encompass the majority of the variation explained by the fossils. 
+
+# pca with both extant and fossil teeth
+library(vegan)
+allteeth = rbind(fossilcords, allcoords)
+pca_all = rda(allteeth ~ 1)
+plot(pca_all, display='sites', pch='.')
+all_pts = scores(pca_all, 1:2, 'sites')
+fossil_pts = all_pts[1:nrow(fossilcords), ]
+extant_pts = all_pts[(nrow(fossilcords)+1):nrow(all_pts), ]
+points(fossil_pts, col='red')
+points(extant_pts, col='blue')
+
+summary(pca_all)
+#when we include the PCs together, we can see a similar distribution of points, such that
+# it may be possible that this is explained by jaw type and or tooth posiition (both?)
 
 
 #what is interesting is that the direction of procrustes coordinates go in the same direction
@@ -82,16 +113,9 @@ This is confirming how many clusters it is best to use (which is 4)
 
 
 
-#k validation or some sort of mahalanobis distance?
-
-the squared Mahalanobis distance is the same as of the sum of the squares
-of all non-zero standardised principal components
-
-to calculate the mahalanobis distance using the Principal components
+#distance matrix of fossil teeth to extant ones
 
 
-BASICALLY, I want to see where the shape of the fossil teeth lie in relation 
-to the shape of the known teeth using the maha. distance.
 
 
 
