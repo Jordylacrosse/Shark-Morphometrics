@@ -30,8 +30,8 @@ biplot(pca_fossil, cex=.5)
 
 text(pca_fossil$scores, as.character(Fossildata$individual), cex=.7)
 
-pca_shark$loadings
-summary(pca_shark)
+pca_fossil$loadings
+summary(pca_fossil)
 
 # overlap fossil teeth on extant PCA
 allcoords = ExtantData[ , 7:34]

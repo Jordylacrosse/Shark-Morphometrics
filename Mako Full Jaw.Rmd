@@ -14,10 +14,14 @@ MakoDat <- read.delim("~/Shark-Morphometrics/Shark Data/Mako Jaw Data.txt")
 makocoords = MakoDat[ , 5:32]
 row.names(makocoords)
 pca_mako = princomp(makocoords)  #pca of all coordainates
-biplot(pca_mako, cex=.5)
+biplot(pca_mako, cex=.5, col="red","blue")
 pca_mako$loadings
+legend("topright", legend=levels(MakoDat$jaw.type), col='blue', pch=17)
+legend("topleft", legend=levels(MakoDat$Side), col='red', pch=17)
 
 
+fos_mako = predict(pca_mako, newdata=fossilcords)
+points(fos_mako[ , 1], fos_mako[ , 2], col='blue', pch=19)
 
 #CVA
 
@@ -50,6 +54,8 @@ xlab=paste("1st canonical axis", paste(round(cva_mako$Var[1,1],1),"%")),
 ylab=paste("2nd canonical axis", paste(round(cva_mako$Var[2,1],1),"%")))
 
 text(cva_mako$CVscores, as.character(factormako), col=as.numeric(factormako), cex=.7)
+
+cva_mako$Dist
 
 #so the opposite jaw and opposite side are more similar
 
