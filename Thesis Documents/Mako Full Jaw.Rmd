@@ -1,0 +1,75 @@
+---
+title: "Mako Full Jaw"
+output: pdf_document
+---
+
+```{r}
+
+MakoDat <- read.delim("~/Shark-Morphometrics/Shark Data/Mako Jaw Data.txt")
+
+
+
+#PCA
+
+makocoords = MakoDat[ , 5:32]
+row.names(makocoords)
+pca_mako = princomp(makocoords)  #pca of all coordainates
+biplot(pca_mako, cex=.5, col="red","blue")
+pca_mako$loadings
+legend("topright", legend=levels(MakoDat$jaw.type), col='blue', pch=17)
+legend("topleft", legend=levels(MakoDat$Side), col='red', pch=17)
+
+
+fos_mako = predict(pca_mako, newdata=fossilcords)
+points(fos_mako[ , 1], fos_mako[ , 2], col='blue', pch=19)
+
+#CVA
+
+
+factormako <- as.factor(paste(MakoDat$jaw.type, MakoDat$Side, sep="_"))
+
+#factor by jaw and side
+
+cva_mako <- CVA(makocoords, groups=factormako, weighting = TRUE, plot = TRUE,
+             rounds = 0, cv = FALSE, p.adjust.method = "none")
+
+
+cva_mako$Var
+cva_mako$Dist
+
+
+```
+
+#Plotting the CV
+
+```{r}
+
+install.packages("car")
+require(car)
+
+#visualize CV scores by their groups 
+
+plot(cva_mako$CVscores, col=factormako, pch=as.numeric(factormako), typ="n",asp=1,
+xlab=paste("1st canonical axis", paste(round(cva_mako$Var[1,1],1),"%")),
+ylab=paste("2nd canonical axis", paste(round(cva_mako$Var[2,1],1),"%")))
+
+text(cva_mako$CVscores, as.character(factormako), col=as.numeric(factormako), cex=.7)
+
+cva_mako$Dist
+
+#so the opposite jaw and opposite side are more similar
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
